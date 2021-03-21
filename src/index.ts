@@ -1,0 +1,1 @@
+export { interpolateFloat } from "./vertices";
