@@ -35,6 +35,7 @@ export type GeppettoPlayer = {
     options?: Partial<AnimationOptions>
   ): AnimationControls;
   render: () => void;
+  destroy: () => void;
 };
 
 export const createPlayer: (
@@ -62,4 +63,5 @@ export const createPlayer: (
     },
   }),
   render() {},
+  destroy() {},
 });
