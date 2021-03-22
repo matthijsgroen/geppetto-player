@@ -3,8 +3,6 @@ import { PreparedAnimation } from "./types";
 type Unsubscribe = () => void;
 
 export type AnimationControls = {
-  disable(): void;
-  enable(): void;
   destroy(): void;
   setLooping(loop: boolean, track: string): void;
   startTrack(track: string): void;
@@ -20,6 +18,7 @@ export type AnimationControls = {
   onControlChange(
     callback: (control: number, value: number) => void
   ): Unsubscribe;
+  render: () => void;
 };
 
 interface AnimationOptions {
@@ -34,7 +33,6 @@ export type GeppettoPlayer = {
     image: HTMLImageElement,
     options?: Partial<AnimationOptions>
   ): AnimationControls;
-  render: () => void;
   destroy: () => void;
 };
 
@@ -42,8 +40,6 @@ export const createPlayer: (
   canvas: HTMLCanvasElement
 ) => GeppettoPlayer = () => ({
   addAnimation: () => ({
-    enable() {},
-    disable() {},
     destroy() {},
     setLooping() {},
     startTrack() {},
@@ -51,6 +47,9 @@ export const createPlayer: (
     setControlValue() {},
     setPanning() {},
     setZoom() {},
+    render() {
+      console.log("render");
+    },
 
     onTrackStopped() {
       return () => {};
@@ -62,6 +61,5 @@ export const createPlayer: (
       return () => {};
     },
   }),
-  render() {},
   destroy() {},
 });
