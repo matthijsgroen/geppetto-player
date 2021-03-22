@@ -8,7 +8,8 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "prebuild": "tsc --emitDeclarationOnly",
+    "prebuild": "rm -f dist/*.d.ts",
+    "postbuild": "tsc",
     "build": "parcel build ./src/index.ts",
     "test": "jest"
   },

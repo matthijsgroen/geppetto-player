@@ -1,4 +1,4 @@
-import { PreparedAnimation } from "./types";
+import { PreparedAnimation } from "./prepareAnimation";
 
 type Unsubscribe = () => void;
 
