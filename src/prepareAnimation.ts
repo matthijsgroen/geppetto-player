@@ -284,6 +284,12 @@ export const prepareAnimation = (
     {}
   );
 
+  const amountIndices = Math.max(
+    ...Object.keys(mutationControlData).map((key) => parseInt(key, 10))
+  );
+  controlMutationIndicesList.length = amountIndices;
+  controlMutationIndicesList.fill([0, 0]);
+
   Object.entries(mutationControlData).forEach(([key, value]) => {
     const items: Vec3[] = value.controls.map<Vec3>((d) => [
       d.valueStartIndex,

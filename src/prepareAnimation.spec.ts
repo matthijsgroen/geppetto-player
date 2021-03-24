@@ -56,10 +56,50 @@ describe("prepareAnimation", () => {
         ],
       },
     ],
-    defaultFrame: {},
-    controls: [],
-    controlValues: {},
-    animations: [],
+    defaultFrame: {
+      hide: [1, 0],
+      stretch: [1, 1],
+      translate: [0, 0],
+      mutate: [2, 0],
+      limb: [45, 0],
+    },
+    controls: [
+      {
+        name: "Control1",
+        type: "slider",
+        steps: [
+          { mutate: [15, 0], limb: [200, 0] },
+          { mutate: [-15, 0], limb: [120, 0] },
+        ],
+      },
+      {
+        name: "Control2",
+        type: "slider",
+        steps: [
+          { hide: [1, 0], limb: [-20, 0] },
+          { hide: [0.2, 0], limb: [-60, 0] },
+        ],
+      },
+    ],
+    controlValues: {
+      Control1: 0.3,
+      Control2: 0.1,
+    },
+    animations: [
+      {
+        name: "AnimationTrack",
+        looping: false,
+        keyframes: [
+          {
+            time: 2000,
+            controlValues: {
+              Control1: 0,
+              Control2: 0.4,
+            },
+          },
+        ],
+      },
+    ],
   };
 
   describe("mutators buffer", () => {
@@ -109,6 +149,77 @@ describe("prepareAnimation", () => {
       const buffer = result.mutatorParents;
       expect(buffer.data[1]).toEqual(0);
       expect(buffer.data[3]).toEqual(2);
+    });
+  });
+
+  describe("mutationValues", () => {
+    it("places all mutation values in order in a buffer", () => {
+      const result = prepareAnimation(imageDefinition);
+      const buffer = result.mutationValues;
+      expect(buffer.data).toEqual(
+        new Float32Array([0, 0, 1, 0, 2, 0, 1, 1, 45, 0])
+      );
+    });
+  });
+
+  describe("control administration", () => {
+    it("builds a structure to link control mechanics to mutation values", () => {
+      const {
+        controlMutationValues,
+        controlMutationIndices,
+        mutationValueIndices,
+        mutators,
+      } = prepareAnimation(imageDefinition);
+
+      // These are all the values of control steps listed above:
+      expect(controlMutationValues.stride).toEqual(2);
+      expect(controlMutationValues.data).toEqual(
+        // prettier-ignore
+        new Float32Array([
+          15, 0, -15, 0,  // Control1.mutate: [15, 0], [-15, 0]
+          200, 0, 120, 0, // Control1.limb: [200, 0], [120, 0]
+          1, 0, 0.2, 0,   // Control2.hide: [1, 0], [0.2, 0]
+          -20, 0, -60, 0, // Control2.limb: [-20, 0], [-60, 0]
+        ])
+      );
+
+      // under what control is a certain mutation
+      // this is a Vec2
+      expect(controlMutationIndices.stride).toEqual(2);
+      expect(controlMutationIndices.length).toEqual(mutators.length);
+      expect(controlMutationIndices.data).toEqual(
+        // 0. translate 0, 0 - not under control
+        // 1. hide 0, 1 - under control by one control (index 0 start)
+        // 2. mutate 1, 1 - under control by one control (index 1 start)
+        // 3. stretch 0, 0 - not under control
+        // 4. limb 2, 2 - under control by two contorls (index 2 start)
+        new Int16Array([0, 0, 0, 1, 1, 1, 0, 0, 2, 2])
+      );
+
+      expect(mutationValueIndices.stride).toEqual(3);
+      expect(mutationValueIndices.data).toEqual(
+        // index 0 = 4, 1, 0. (hide)
+        //   values start at 4 (see controlMutationValues)
+        //   controlValue = 1 (2nd controller)
+        //   controlType = 0 (default for now)
+
+        // index 1 = 0, 0, 0. (mutate)
+        //   values start at 0 (see controlMutationValues)
+        //   controlValue = 0 (1st controller)
+        //   controlType = 0 (default for now)
+
+        // index 2 = 2, 0, 0. (limb)
+        //   values start at 2 (see controlMutationValues)
+        //   controlValue = 0 (1st controller)
+        //   controlType = 0 (default for now)
+
+        // index 3 = 6, 1, 0. (limb)
+        //   values start at 6 (see controlMutationValues)
+        //   controlValue = 1 (2nd controller)
+        //   controlType = 0 (default for now)
+
+        new Int16Array([4, 1, 0, 0, 0, 0, 2, 0, 0, 6, 1, 0])
+      );
     });
   });
 });
