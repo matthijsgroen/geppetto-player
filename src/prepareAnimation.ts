@@ -1,4 +1,10 @@
 import Delaunator from "delaunator";
+import {
+  PreparedFloatBuffer,
+  PreparedIntBuffer,
+  vectorArrayToPreparedFloatBuffer,
+  vectorArrayToPreparedIntBuffer,
+} from "./buffer";
 import { isMutationVector, isShapeDefinition, walkShapes } from "./traverse";
 import {
   Animation,
@@ -30,19 +36,13 @@ const getAnchor = (sprite: SpriteDefinition): Vec2 => {
 export const fileredTriangles = (points: number[][]): number[] =>
   Delaunator.from(points).triangles;
 
-export const vectorTypeMapping = {
+const vectorTypeMapping = {
   translate: 1,
   stretch: 2,
   rotate: 3,
   deform: 4,
   opacity: 5,
 };
-
-export const flatten = (vectors: Vec2[] | Vec3[] | Vec4[]): number[] =>
-  ((vectors as unknown) as number[][]).reduce<number[]>(
-    (result, vec) => result.concat(vec),
-    []
-  );
 
 const mutatorToVec4 = (mutator: MutationVector): Vec4 => [
   vectorTypeMapping[mutator.type],
@@ -133,34 +133,6 @@ export const createMutationList = (
     shapeMutatorMapping,
   };
 };
-
-export type PreparedFloatBuffer = {
-  data: Float32Array;
-  length: number;
-  stride: number;
-};
-
-export type PreparedIntBuffer = {
-  data: Int16Array;
-  length: number;
-  stride: number;
-};
-
-const vectorArrayToPreparedFloatBuffer = (
-  array: Vec2[] | Vec3[] | Vec4[]
-): PreparedFloatBuffer => ({
-  data: new Float32Array(flatten(array)),
-  length: array.length,
-  stride: array[0].length,
-});
-
-const vectorArrayToPreparedIntuffer = (
-  array: Vec2[] | Vec3[] | Vec4[]
-): PreparedIntBuffer => ({
-  data: new Int16Array(flatten(array)),
-  length: array.length,
-  stride: array[0].length,
-});
 
 export type Control = {
   name: string;
@@ -341,10 +313,10 @@ export const prepareAnimation = (
     controlMutationValues: vectorArrayToPreparedFloatBuffer(
       controlMutationValueList
     ),
-    mutationValueIndices: vectorArrayToPreparedIntuffer(
+    mutationValueIndices: vectorArrayToPreparedIntBuffer(
       mutationValueIndicesList
     ),
-    controlMutationIndices: vectorArrayToPreparedIntuffer(
+    controlMutationIndices: vectorArrayToPreparedIntBuffer(
       controlMutationIndicesList
     ),
     shapeVertices: vectorArrayToPreparedFloatBuffer(vertices),
