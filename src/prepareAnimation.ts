@@ -1,5 +1,6 @@
 import Delaunator from "delaunator";
 import {
+  flatten,
   PreparedFloatBuffer,
   PreparedIntBuffer,
   vectorArrayToPreparedFloatBuffer,
@@ -7,7 +8,6 @@ import {
 } from "./buffer";
 import { isMutationVector, isShapeDefinition, walkShapes } from "./traverse";
 import {
-  Animation,
   ControlDefinition,
   ImageDefinition,
   MutationVector,
@@ -134,6 +134,39 @@ export const createMutationList = (
   };
 };
 
+const convertAnimations = (imageDefinition: ImageDefinition): Animation[] => {
+  const controlNames = imageDefinition.controls.map((c) => c.name);
+  return imageDefinition.animations.map<Animation>((a) => {
+    const tracks: Record<number, Float32Array> = {};
+
+    const trackControls = a.keyframes
+      .reduce<string[]>(
+        (result, frame) => result.concat(Object.keys(frame.controlValues)),
+        []
+      )
+      .filter((v, i, l) => l.indexOf(v) === i);
+
+    trackControls.forEach((controlName) => {
+      const frames: Vec2[] = [];
+      a.keyframes.forEach((frame) => {
+        const value = frame.controlValues[controlName];
+        if (value !== undefined) {
+          frames.push([frame.time, value]);
+        }
+      });
+      tracks[controlNames.indexOf(controlName)] = new Float32Array(
+        flatten(frames)
+      );
+    });
+
+    return {
+      name: a.name,
+      looping: a.looping,
+      tracks,
+    };
+  });
+};
+
 export type Control = {
   name: string;
   steps: number;
@@ -147,6 +180,12 @@ export type Shape = {
   x: number;
   y: number;
   z: number;
+};
+
+export type Animation = {
+  name: string;
+  looping: boolean;
+  tracks: Record<number, Float32Array>;
 };
 
 export type PreparedAnimation = {
@@ -329,6 +368,6 @@ export const prepareAnimation = (
     shapeIndices: new Uint16Array(indices),
     shapes: elements,
     controls,
-    animations: imageDefinition.animations,
+    animations: convertAnimations(imageDefinition),
   };
 };

@@ -97,6 +97,19 @@ describe("prepareAnimation", () => {
               Control2: 0.4,
             },
           },
+          {
+            time: 4000,
+            controlValues: {
+              Control1: 0.7,
+            },
+          },
+          {
+            time: 6200,
+            controlValues: {
+              Control1: 1.0,
+              Control2: 1.0,
+            },
+          },
         ],
       },
     ],
@@ -220,6 +233,30 @@ describe("prepareAnimation", () => {
 
         new Int16Array([4, 1, 0, 0, 0, 0, 2, 0, 0, 6, 1, 0])
       );
+    });
+
+    it("reports what controls there are", () => {
+      const { controls } = prepareAnimation(imageDefinition);
+      expect(controls).toEqual([
+        { name: "Control1", steps: 2 },
+        { name: "Control2", steps: 2 },
+      ]);
+    });
+  });
+
+  describe("animations", () => {
+    it("makes a track per control in each animation", () => {
+      const { animations } = prepareAnimation(imageDefinition);
+      expect(animations).toEqual([
+        {
+          name: "AnimationTrack",
+          looping: false,
+          tracks: {
+            "0": new Float32Array([2000, 0, 4000, 0.7, 6200, 1.0]),
+            "1": new Float32Array([2000, 0.4, 6200, 1.0]),
+          },
+        },
+      ]);
     });
   });
 });
