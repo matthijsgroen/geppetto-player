@@ -26,10 +26,10 @@ export const walkShapes = (
   for (let shape of shapes) {
     visitor(shape, parents);
     for (let mutator of shape.mutationVectors) {
-      visitor(mutator, [shape, ...parents]);
+      visitor(mutator, [...parents, shape]);
     }
     if (shape.type === "folder") {
-      walkShapes(shape.items, visitor, [shape, ...parents]);
+      walkShapes(shape.items, visitor, [...parents, shape]);
     }
   }
 };

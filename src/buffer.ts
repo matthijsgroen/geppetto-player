@@ -23,7 +23,7 @@ export const vectorArrayToPreparedFloatBuffer = (
 ): PreparedFloatBuffer => ({
   data: new Float32Array(flatten(array)),
   length: array.length,
-  stride: array[0].length,
+  stride: array[0]?.length || 0,
 });
 
 export const vectorArrayToPreparedIntBuffer = (
@@ -31,5 +31,5 @@ export const vectorArrayToPreparedIntBuffer = (
 ): PreparedIntBuffer => ({
   data: new Int16Array(flatten(array)),
   length: array.length,
-  stride: array[0].length,
+  stride: array[0]?.length || 0,
 });

@@ -34,6 +34,11 @@ describe("vectorArrayToPreparedIntBuffer", () => {
       const result = vectorArrayToPreparedIntBuffer(vec2Array);
       expect(result.stride).toBe(2);
     });
+
+    it("sets 0 as stride when array is empty", () => {
+      const result = vectorArrayToPreparedIntBuffer([]);
+      expect(result.stride).toBe(0);
+    });
   });
 
   it("sets the buffer length based on length of vector array", () => {

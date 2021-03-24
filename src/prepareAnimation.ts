@@ -115,13 +115,13 @@ export const createMutationList = (
         parentMutation === null
           ? -1
           : mutatorIndices.findIndex((e) => e.name === parentMutation.name);
+
       shapeMutatorMapping[item.name] = mutatorIndex;
     }
     return undefined;
   });
 
   const parentList = new Int16Array(mutators.length);
-
   mutatorIndices.forEach((item, index) => {
     parentList[index] = item.parent;
   });
