@@ -99,6 +99,9 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
       gl.shaderSource(fs, fragmentShaderSource);
       gl.compileShader(vs);
       gl.compileShader(fs);
+
+      gl.attachShader(program, vs);
+      gl.attachShader(program, fs);
       gl.linkProgram(program);
 
       if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
