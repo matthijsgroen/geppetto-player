@@ -1,4 +1,4 @@
-import { PreparedAnimation } from "./prepareAnimation";
+import { prepareAnimation, PreparedAnimation } from "./prepareAnimation";
 import { animationFragmentShader } from "./shaders/fragmentShader";
 import { animationVertexShader } from "./shaders/vertexShader";
 
@@ -60,6 +60,44 @@ export const setupWebGL = (element: HTMLCanvasElement): GeppettoPlayer => {
   return createPlayer(element);
 };
 
+const setupWebGLProgram = (
+  gl: WebGLRenderingContext,
+  animation: PreparedAnimation
+): [WebGLProgram, WebGLShader, WebGLShader] => {
+  const program = gl.createProgram();
+  if (!program) throw new Error("Failed to create shader program");
+
+  const vertexShaderSource = animationVertexShader(animation);
+  const fragmentShaderSource = animationFragmentShader();
+
+  const vs = gl.createShader(gl.VERTEX_SHADER);
+  const fs = gl.createShader(gl.FRAGMENT_SHADER);
+  if (!vs || !fs) {
+    gl.deleteProgram(program);
+    if (vs) gl.deleteShader(vs);
+    if (fs) gl.deleteShader(fs);
+    throw new Error("Failed to create shader program");
+  }
+
+  gl.shaderSource(vs, vertexShaderSource);
+  gl.shaderSource(fs, fragmentShaderSource);
+  gl.compileShader(vs);
+  gl.compileShader(fs);
+
+  gl.attachShader(program, vs);
+  gl.attachShader(program, fs);
+  gl.linkProgram(program);
+
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.error("Link failed: " + gl.getProgramInfoLog(program));
+    console.error("vs info-log: " + gl.getShaderInfoLog(vs));
+    console.error("fs info-log: " + gl.getShaderInfoLog(fs));
+    throw new Error("Could not initialise shaders");
+  }
+
+  return [program, vs, fs];
+};
+
 export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
   const gl = element.getContext("webgl2", {
     premultipliedalpha: true,
@@ -80,36 +118,10 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
       //   image: HTMLImageElement,
       //   textureUnit: number
     ) => {
-      const program = gl.createProgram();
-      if (!program) throw new Error("Failed to create shader program");
-
-      const vertexShaderSource = animationVertexShader(animation);
-      const fragmentShaderSource = animationFragmentShader();
-
-      const vs = gl.createShader(gl.VERTEX_SHADER);
-      const fs = gl.createShader(gl.FRAGMENT_SHADER);
-      if (!vs || !fs) {
-        gl.deleteProgram(program);
-        if (vs) gl.deleteShader(vs);
-        if (fs) gl.deleteShader(fs);
-        throw new Error("Failed to create shader program");
-      }
-
-      gl.shaderSource(vs, vertexShaderSource);
-      gl.shaderSource(fs, fragmentShaderSource);
-      gl.compileShader(vs);
-      gl.compileShader(fs);
-
-      gl.attachShader(program, vs);
-      gl.attachShader(program, fs);
-      gl.linkProgram(program);
-
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        console.error("Link failed: " + gl.getProgramInfoLog(program));
-        console.error("vs info-log: " + gl.getShaderInfoLog(vs));
-        console.error("fs info-log: " + gl.getShaderInfoLog(fs));
-        throw new Error("Could not initialise shaders");
-      }
+      const [program, vs, fs] = setupWebGLProgram(gl, animation);
+      // 3. Load texture
+      // 4. Setup attribute buffers
+      // 5. Set uniforms
 
       const newAnimation = {
         destroy() {
