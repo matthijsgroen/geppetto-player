@@ -1,4 +1,6 @@
 import { PreparedAnimation } from "./prepareAnimation";
+import { animationFragmentShader } from "./shaders/fragmentShader";
+import { animationVertexShader } from "./shaders/vertexShader";
 
 type Unsubscribe = () => void;
 
@@ -28,38 +30,119 @@ interface AnimationOptions {
 }
 
 export type GeppettoPlayer = {
+  render: () => void;
   addAnimation(
     animation: PreparedAnimation,
     image: HTMLImageElement,
+    textureUnit: number,
     options?: Partial<AnimationOptions>
   ): AnimationControls;
   destroy: () => void;
 };
 
-export const createPlayer: (
-  canvas: HTMLCanvasElement
-) => GeppettoPlayer = () => ({
-  addAnimation: () => ({
-    destroy() {},
-    setLooping() {},
-    startTrack() {},
-    stopTrack() {},
-    setControlValue() {},
-    setPanning() {},
-    setZoom() {},
-    render() {
-      console.log("render");
-    },
+export const setupWebGL = (element: HTMLCanvasElement): GeppettoPlayer => {
+  const gl = element.getContext("webgl2", {
+    premultipliedalpha: true,
+    depth: true,
+    antialias: true,
+    powerPreference: "low-power",
+  }) as WebGLRenderingContext;
 
-    onTrackStopped() {
-      return () => {};
+  if (!gl) {
+    throw new Error("No WebGL Support");
+  }
+
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.enable(gl.DEPTH_TEST);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+  return createPlayer(element);
+};
+
+export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
+  const gl = element.getContext("webgl2", {
+    premultipliedalpha: true,
+    depth: true,
+    antialias: true,
+    powerPreference: "low-power",
+  }) as WebGLRenderingContext;
+
+  const animations: AnimationControls[] = [];
+
+  return {
+    render: () => {
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.viewport(0, 0, element.width, element.height);
     },
-    onEvent() {
-      return () => {};
+    addAnimation: (
+      animation: PreparedAnimation
+      //   image: HTMLImageElement,
+      //   textureUnit: number
+    ) => {
+      const program = gl.createProgram();
+      if (!program) throw new Error("Failed to create shader program");
+
+      const vertexShaderSource = animationVertexShader(animation);
+      const fragmentShaderSource = animationFragmentShader();
+
+      const vs = gl.createShader(gl.VERTEX_SHADER);
+      const fs = gl.createShader(gl.FRAGMENT_SHADER);
+      if (!vs || !fs) {
+        gl.deleteProgram(program);
+        if (vs) gl.deleteShader(vs);
+        if (fs) gl.deleteShader(fs);
+        throw new Error("Failed to create shader program");
+      }
+
+      gl.shaderSource(vs, vertexShaderSource);
+      gl.shaderSource(fs, fragmentShaderSource);
+      gl.compileShader(vs);
+      gl.compileShader(fs);
+      gl.linkProgram(program);
+
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error("Link failed: " + gl.getProgramInfoLog(program));
+        console.error("vs info-log: " + gl.getShaderInfoLog(vs));
+        console.error("fs info-log: " + gl.getShaderInfoLog(fs));
+        throw new Error("Could not initialise shaders");
+      }
+
+      const newAnimation = {
+        destroy() {
+          gl.deleteShader(vs);
+          gl.deleteShader(fs);
+          gl.deleteProgram(program);
+          animations.splice(animations.indexOf(newAnimation), 1);
+        },
+        setLooping() {},
+        startTrack() {},
+        stopTrack() {},
+        setControlValue() {},
+        setPanning() {},
+        setZoom() {},
+        render() {
+          console.log("render");
+        },
+        onTrackStopped() {
+          return () => {};
+        },
+        onEvent() {
+          return () => {};
+        },
+        onControlChange() {
+          return () => {};
+        },
+      };
+      animations.push(newAnimation);
+
+      return newAnimation;
     },
-    onControlChange() {
-      return () => {};
+    destroy() {
+      for (let anim of animations) {
+        anim.destroy();
+      }
+      animations.length = 0;
     },
-  }),
-  destroy() {},
-});
+  };
+};

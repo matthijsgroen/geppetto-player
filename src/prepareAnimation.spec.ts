@@ -181,6 +181,7 @@ describe("prepareAnimation", () => {
         controlMutationValues,
         controlMutationIndices,
         mutationValueIndices,
+        maxIteration,
         mutators,
       } = prepareAnimation(imageDefinition);
 
@@ -233,6 +234,8 @@ describe("prepareAnimation", () => {
 
         new Int16Array([4, 1, 0, 0, 0, 0, 2, 0, 0, 6, 1, 0])
       );
+
+      expect(maxIteration).toEqual(2);
     });
 
     it("reports what controls there are", () => {

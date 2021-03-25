@@ -8,8 +8,8 @@
     "declaration": true,
     "sourceMap": true,           
     "declarationDir": "./dist/",
+    "outDir": "./dist/",
     "rootDir": "./src/",
-    "composite": true,
     "removeComments": true,
     "emitDeclarationOnly": true,
 

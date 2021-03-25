@@ -198,9 +198,8 @@ export type PreparedAnimation = {
   shapeVertices: PreparedFloatBuffer;
   shapeIndices: Uint16Array;
   shapes: Shape[];
-
+  maxIteration: number;
   controls: Control[];
-  // TODO: Rewrite animations in control tracks per control
   animations: Animation[];
 };
 
@@ -329,6 +328,8 @@ export const prepareAnimation = (
   controlMutationIndicesList.length = amountIndices;
   controlMutationIndicesList.fill([0, 0]);
 
+  let maxIteration = 0;
+
   Object.entries(mutationControlData).forEach(([key, value]) => {
     const items: Vec3[] = value.controls.map<Vec3>((d) => [
       d.valueStartIndex,
@@ -340,6 +341,7 @@ export const prepareAnimation = (
       mutationValueIndicesList.length,
       items.length,
     ];
+    maxIteration = Math.max(maxIteration, items.length);
     mutationValueIndicesList.push(...items);
   });
 
@@ -368,6 +370,7 @@ export const prepareAnimation = (
     shapeIndices: new Uint16Array(indices),
     shapes: elements,
     controls,
+    maxIteration,
     animations: convertAnimations(imageDefinition),
   };
 };
