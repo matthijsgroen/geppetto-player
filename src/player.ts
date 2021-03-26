@@ -1,4 +1,4 @@
-import { prepareAnimation, PreparedAnimation } from "./prepareAnimation";
+import { PreparedAnimation } from "./prepareAnimation";
 import { animationFragmentShader } from "./shaders/fragmentShader";
 import { animationVertexShader } from "./shaders/vertexShader";
 
@@ -74,8 +74,8 @@ const setupWebGLProgram = (
   const fs = gl.createShader(gl.FRAGMENT_SHADER);
   if (!vs || !fs) {
     gl.deleteProgram(program);
-    if (vs) gl.deleteShader(vs);
-    if (fs) gl.deleteShader(fs);
+    gl.deleteShader(vs);
+    gl.deleteShader(fs);
     throw new Error("Failed to create shader program");
   }
 
@@ -98,6 +98,30 @@ const setupWebGLProgram = (
   return [program, vs, fs];
 };
 
+const setupTexture = (
+  gl: WebGLRenderingContext,
+  program: WebGLProgram,
+  image: HTMLImageElement,
+  textureUnit: number
+): WebGLTexture | null => {
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+  gl.uniform2f(
+    gl.getUniformLocation(program, "uTextureDimensions"),
+    image.width,
+    image.height
+  );
+  gl.uniform1i(gl.getUniformLocation(program, "uSampler"), textureUnit);
+
+  return texture;
+};
+
 export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
   const gl = element.getContext("webgl2", {
     premultipliedalpha: true,
@@ -114,12 +138,17 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
       gl.viewport(0, 0, element.width, element.height);
     },
     addAnimation: (
-      animation: PreparedAnimation
-      //   image: HTMLImageElement,
-      //   textureUnit: number
+      animation: PreparedAnimation,
+      image: HTMLImageElement,
+      textureUnit: number
     ) => {
+      console.log("Setup program and shaders");
       const [program, vs, fs] = setupWebGLProgram(gl, animation);
       // 3. Load texture
+      gl.useProgram(program);
+      console.log("Setup texture");
+      const texture = setupTexture(gl, program, image, textureUnit);
+
       // 4. Setup attribute buffers
       // 5. Set uniforms
 
@@ -128,6 +157,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
           gl.deleteShader(vs);
           gl.deleteShader(fs);
           gl.deleteProgram(program);
+          gl.deleteTexture(texture);
           animations.splice(animations.indexOf(newAnimation), 1);
         },
         setLooping() {},
