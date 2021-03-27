@@ -8,7 +8,6 @@ import {
 } from "./buffer";
 import { isMutationVector, isShapeDefinition, walkShapes } from "./traverse";
 import {
-  ControlDefinition,
   ImageDefinition,
   MutationVector,
   ShapeDefinition,
@@ -200,6 +199,7 @@ export type PreparedAnimation = {
   shapes: Shape[];
   maxIteration: number;
   controls: Control[];
+  defaultControlValues: Float32Array;
   animations: Animation[];
 };
 
@@ -279,8 +279,9 @@ export const prepareAnimation = (
   });
   elements.sort((a, b) => (b.z || 0) - (a.z || 0));
 
+  const controlValues = new Float32Array(imageDefinition.controls.length);
   const mutationControlData: MutationControl = imageDefinition.controls.reduce<MutationControl>(
-    (result: MutationControl, control: ControlDefinition) => {
+    (result, control, index) => {
       const controlMutations = control.steps.reduce<string[]>(
         (result, frame) =>
           result.concat(
@@ -292,6 +293,7 @@ export const prepareAnimation = (
         name: control.name,
         steps: control.steps.length,
       });
+      controlValues[index] = imageDefinition.controlValues[control.name];
       controlMutations.forEach((mutation) => {
         const index = mutators.indexOf(mutation);
         const values: Vec2[] = control.steps.map((k) => k[mutation]);
@@ -366,6 +368,7 @@ export const prepareAnimation = (
     controlMutationIndices: vectorArrayToPreparedIntBuffer(
       controlMutationIndicesList
     ),
+    defaultControlValues: controlValues,
     shapeVertices: vectorArrayToPreparedFloatBuffer(vertices),
     shapeIndices: new Uint16Array(indices),
     shapes: elements,

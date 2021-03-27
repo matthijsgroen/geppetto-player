@@ -1,3 +1,4 @@
+import { PreparedFloatBuffer, PreparedIntBuffer } from "./buffer";
 import { PreparedAnimation } from "./prepareAnimation";
 import { animationFragmentShader } from "./shaders/fragmentShader";
 import { animationVertexShader } from "./shaders/vertexShader";
@@ -98,6 +99,27 @@ const setupWebGLProgram = (
   return [program, vs, fs];
 };
 
+const setProgramBuffer = (gl: WebGLRenderingContext, program: WebGLProgram) => (
+  uniform: string,
+  buffer: PreparedFloatBuffer | PreparedIntBuffer
+) => {
+  const uniformLocation = gl.getUniformLocation(program, uniform);
+  console.log(
+    `Setting uniform${buffer.stride}fv("${uniform}", number[${buffer.data.length}])`
+  );
+  const stride = buffer.stride;
+
+  if (stride == 1) {
+    gl.uniform1fv(uniformLocation, buffer.data);
+  } else if (stride == 2) {
+    gl.uniform2fv(uniformLocation, buffer.data);
+  } else if (stride == 3) {
+    gl.uniform3fv(uniformLocation, buffer.data);
+  } else if (stride == 4) {
+    gl.uniform4fv(uniformLocation, buffer.data);
+  }
+};
+
 const setupTexture = (
   gl: WebGLRenderingContext,
   program: WebGLProgram,
@@ -149,8 +171,36 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
       console.log("Setup texture");
       const texture = setupTexture(gl, program, image, textureUnit);
 
-      // 4. Setup attribute buffers
-      // 5. Set uniforms
+      // 4. Set Uniforms
+      const setBuffer = setProgramBuffer(gl, program);
+      setBuffer("uMutationVectors", animation.mutators);
+      setBuffer("uMutationParent", animation.mutatorParents);
+      setBuffer("uMutationValues", animation.mutationValues);
+      setBuffer("uControlMutationValues", animation.controlMutationValues);
+      setBuffer("uMutationValueIndices", animation.mutationValueIndices);
+      setBuffer("uControlMutationIndices", animation.controlMutationIndices);
+
+      const uControlValues = gl.getUniformLocation(program, "uControlValues");
+      gl.uniform1fv(uControlValues, animation.defaultControlValues);
+
+      // 5. Set shape buffers
+      console.log("Setup shape buffers");
+      const vertexBuffer = gl.createBuffer();
+      const indexBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        animation.shapeVertices.data,
+        gl.STATIC_DRAW
+      );
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+      gl.bufferData(
+        gl.ELEMENT_ARRAY_BUFFER,
+        animation.shapeIndices,
+        gl.STATIC_DRAW
+      );
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
       const newAnimation = {
         destroy() {
@@ -158,6 +208,8 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
           gl.deleteShader(fs);
           gl.deleteProgram(program);
           gl.deleteTexture(texture);
+          gl.deleteBuffer(vertexBuffer);
+          gl.deleteBuffer(indexBuffer);
           animations.splice(animations.indexOf(newAnimation), 1);
         },
         setLooping() {},
@@ -167,6 +219,15 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
         setPanning() {},
         setZoom() {},
         render() {
+          /**
+           * [ ] uniform vec2 viewport;
+           * [ ] uniform vec3 basePosition;
+           * [ ] uniform vec3 translate;
+           * [ ] uniform float mutation;
+           * [ ] uniform vec4 scale;
+           *
+           */
+
           console.log("render");
         },
         onTrackStopped() {
