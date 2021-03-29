@@ -202,6 +202,23 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
       );
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
+      // Get locations for rendering
+      const uBasePosition = gl.getUniformLocation(program, "basePosition");
+      const uTranslate = gl.getUniformLocation(program, "translate");
+      const uMutation = gl.getUniformLocation(program, "mutation");
+      const uViewport = gl.getUniformLocation(program, "viewport");
+      const uScale = gl.getUniformLocation(program, "scale");
+
+      const aCoord = gl.getAttribLocation(program, "coordinates");
+      const aTexCoord = gl.getAttribLocation(program, "aTextureCoord");
+
+      let cWidth = 0,
+        cHeight = 0;
+      let basePosition = [0, 0, 0.1];
+      let zoom = 1.0;
+      let scale = 1.0;
+      let pan = [0, 0];
+
       const newAnimation = {
         destroy() {
           gl.deleteShader(vs);
@@ -227,8 +244,72 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
            * [ ] uniform vec4 scale;
            *
            */
+          gl.useProgram(program);
+          gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+          gl.vertexAttribPointer(
+            aCoord,
+            2,
+            gl.FLOAT,
+            false,
+            Float32Array.BYTES_PER_ELEMENT * 4,
+            /* offset */ 0
+          );
+          gl.enableVertexAttribArray(aCoord);
+          gl.vertexAttribPointer(
+            aTexCoord,
+            2,
+            gl.FLOAT,
+            false,
+            Float32Array.BYTES_PER_ELEMENT * 4,
+            /* offset */ 2 * Float32Array.BYTES_PER_ELEMENT
+          );
+          gl.enableVertexAttribArray(aTexCoord);
+
+          if (element.width !== cWidth || element.height !== cHeight) {
+            const canvasWidth = element.width;
+            const canvasHeight = element.height;
+            const landscape =
+              image.width / canvasWidth > image.height / canvasHeight;
+
+            scale = landscape
+              ? canvasWidth / image.width
+              : canvasHeight / image.height;
+
+            gl.uniform2f(uViewport, canvasWidth, canvasHeight);
+
+            basePosition = [
+              canvasWidth / 2 / scale,
+              canvasHeight / 2 / scale,
+              0.1,
+            ];
+            cWidth = element.width;
+            cHeight = element.height;
+          }
+
+          gl.uniform4f(uScale, scale, zoom, pan[0], pan[1]);
+          gl.activeTexture(textureUnit);
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+          gl.uniform3f(
+            uBasePosition,
+            basePosition[0],
+            basePosition[1],
+            basePosition[2]
+          );
 
           console.log("render");
+
+          for (let shape of animation.shapes) {
+            gl.uniform3f(uTranslate, shape.x, shape.y, shape.z);
+            gl.uniform1f(uMutation, shape.mutator);
+            gl.drawElements(
+              gl.TRIANGLES,
+              shape.amount,
+              gl.UNSIGNED_SHORT,
+              shape.start
+            );
+          }
         },
         onTrackStopped() {
           return () => {};
