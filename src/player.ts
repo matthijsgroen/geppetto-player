@@ -118,9 +118,6 @@ const setProgramBuffer = (gl: WebGLRenderingContext, program: WebGLProgram) => (
   buffer: PreparedFloatBuffer | PreparedIntBuffer
 ) => {
   const uniformLocation = gl.getUniformLocation(program, uniform);
-  console.log(
-    `Setting uniform${buffer.stride}fv("${uniform}", number[${buffer.data.length}])`
-  );
   const stride = buffer.stride;
 
   if (stride == 1) {
@@ -187,11 +184,9 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
         gl.TEXTURE8,
         gl.TEXTURE9,
       ][textureUnit];
-      console.log("Setup program and shaders");
       const [program, vs, fs] = setupWebGLProgram(gl, animation);
       // 3. Load texture
       gl.useProgram(program);
-      console.log("Setup texture");
       const texture = setupTexture(gl, program, image, unit);
 
       // 4. Set Uniforms
@@ -212,7 +207,6 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
       );
 
       // 5. Set shape buffers
-      console.log("Setup shape buffers");
       const vertexBuffer = gl.createBuffer();
       const indexBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -251,6 +245,41 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
       const trackNames = animation.animations.map((a) => a.name);
       const looping: boolean[] = animation.animations.map((a) => a.looping);
 
+      const stopTrack = (track: string): void => {
+        // Remove from playing list
+        const playingIndex = playingAnimations.findIndex(
+          (e) => e.name === track
+        );
+        if (playingIndex === -1) return;
+        const playing = playingAnimations[playingIndex];
+
+        const now = +new Date();
+        let playTime = now - playing.startedAt + playing.startAt;
+
+        const playingAnimation = animation.animations[playing.index];
+        if (looping[playing.index]) {
+          playTime %= playingAnimation.duration;
+        }
+        playingAnimations.splice(playingIndex, 1);
+
+        // place current active control values in control values list
+        for (let [controlIndex, track] of playingAnimation.tracks) {
+          const value = interpolateFloat(
+            track,
+            playTime,
+            controlValues[controlIndex]
+          );
+          controlValues[controlIndex] = value;
+          // emit control change event
+        }
+
+        // events in previous timespan?? event emitting here.
+      };
+      const setControlValue = () => {
+        // stop all conflicting tracks
+        // emit control change event
+      };
+
       const newAnimation: AnimationControls = {
         destroy() {
           gl.deleteShader(vs);
@@ -287,13 +316,8 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             startedAt: +new Date(),
           });
         },
-        stopTrack() {
-          // Remove from playing list
-          // place current active control values in control values list
-        },
-        setControlValue() {
-          // stop all conflicting tracks
-        },
+        stopTrack,
+        setControlValue,
         setPanning(newPanX, newPanY) {
           panX = newPanX;
           panY = newPanY;
