@@ -136,7 +136,7 @@ export const createMutationList = (
 const convertAnimations = (imageDefinition: ImageDefinition): Animation[] => {
   const controlNames = imageDefinition.controls.map((c) => c.name);
   return imageDefinition.animations.map<Animation>((a) => {
-    const tracks: Record<number, Float32Array> = {};
+    const tracks: [number, Float32Array][] = [];
 
     const trackControls = a.keyframes
       .reduce<string[]>(
@@ -153,14 +153,16 @@ const convertAnimations = (imageDefinition: ImageDefinition): Animation[] => {
           frames.push([frame.time, value]);
         }
       });
-      tracks[controlNames.indexOf(controlName)] = new Float32Array(
-        flatten(frames)
-      );
+      tracks.push([
+        controlNames.indexOf(controlName),
+        new Float32Array(flatten(frames)),
+      ]);
     });
 
     return {
       name: a.name,
       looping: a.looping,
+      duration: a.keyframes[a.keyframes.length - 1].time,
       tracks,
     };
   });
@@ -184,7 +186,8 @@ export type Shape = {
 export type Animation = {
   name: string;
   looping: boolean;
-  tracks: Record<number, Float32Array>;
+  tracks: [number, Float32Array][];
+  duration: number;
 };
 
 export type PreparedAnimation = {
