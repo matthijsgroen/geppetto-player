@@ -1,6 +1,6 @@
 {
   "name": "geppetto-player",
-  "version": "0.0.1-alpha.0",
+  "version": "1.0.0-alpha.1",
   "description": "WebGL Player for Geppetto files",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
