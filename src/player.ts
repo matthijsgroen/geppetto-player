@@ -29,7 +29,7 @@ export type AnimationControls = {
   render: () => void;
 };
 
-interface AnimationOptions {
+export interface AnimationOptions {
   panX: number;
   panY: number;
   zoom: number;
@@ -60,12 +60,17 @@ export type GeppettoPlayer = {
    * skip the call to this method in your render cycle.
    */
   render: () => void;
+
   addAnimation(
     animation: PreparedImageDefinition,
     image: HTMLImageElement,
     textureUnit: number,
     options?: Partial<AnimationOptions>
   ): AnimationControls;
+
+  /**
+   * Destroys all animations added to this player.
+   */
   destroy: () => void;
 };
 
