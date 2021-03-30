@@ -234,7 +234,7 @@ export const prepareAnimation = (
       mutator: 0,
       x: itemOffset[0],
       y: itemOffset[1],
-      z: -0.5 + itemOffset[2] * 0.001,
+      z: -0.9 + itemOffset[2] * 0.0001,
     });
 
     shape.points.forEach(([x, y]) => {

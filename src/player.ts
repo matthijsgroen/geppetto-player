@@ -33,12 +33,14 @@ interface AnimationOptions {
   panX: number;
   panY: number;
   zoom: number;
+  zIndex: number;
 }
 
 const DEFAULT_OPTIONS: AnimationOptions = {
   zoom: 1.0,
   panX: 0.0,
   panY: 0.0,
+  zIndex: 1,
 };
 
 type PlayStatus = {
@@ -138,12 +140,11 @@ const setProgramBuffer = (gl: WebGLRenderingContext, program: WebGLProgram) => (
 const setupTexture = (
   gl: WebGLRenderingContext,
   program: WebGLProgram,
-  image: HTMLImageElement,
-  textureUnit: number
+  image: HTMLImageElement
 ): WebGLTexture | null => {
   const texture = gl.createTexture();
-  gl.activeTexture(textureUnit);
   gl.bindTexture(gl.TEXTURE_2D, texture);
+
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -155,7 +156,6 @@ const setupTexture = (
     image.width,
     image.height
   );
-  gl.uniform1i(gl.getUniformLocation(program, "uSampler"), textureUnit);
 
   return texture;
 };
@@ -194,7 +194,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
       const [program, vs, fs] = setupWebGLProgram(gl, animation);
       // 3. Load texture
       gl.useProgram(program);
-      const texture = setupTexture(gl, program, image, unit);
+      const texture = setupTexture(gl, program, image);
 
       // 4. Set Uniforms
       const setBuffer = setProgramBuffer(gl, program);
@@ -243,10 +243,10 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
 
       let cWidth = 0,
         cHeight = 0;
-      let basePosition = [0, 0, 0.1];
-      let scale = 1.0;
 
-      let { zoom, panX, panY } = { ...DEFAULT_OPTIONS, ...options };
+      let { zoom, panX, panY, zIndex } = { ...DEFAULT_OPTIONS, ...options };
+      let basePosition = [0, 0, zIndex * 0.01];
+      let scale = 1.0;
 
       const playingAnimations: PlayStatus[] = [];
       const trackNames = animation.animations.map((a) => a.name);
@@ -269,6 +269,10 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
         }
         playingAnimations.splice(playingIndex, 1);
 
+        for (const listener of onTrackStoppedListeners) {
+          listener(track);
+        }
+
         // place current active control values in control values list
         for (const [controlIndex, track] of playingAnimation.tracks) {
           const value = interpolateFloat(
@@ -278,6 +282,9 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
           );
           controlValues[controlIndex] = value;
           // emit control change event
+          for (const listener of onControlChangeListeners) {
+            listener(controlIndex, value);
+          }
         }
 
         // events in previous timespan?? event emitting here.
@@ -371,15 +378,18 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             basePosition = [
               canvasWidth / 2 / scale,
               canvasHeight / 2 / scale,
-              0.1,
+              zIndex * 0.01,
             ];
             cWidth = element.width;
             cHeight = element.height;
           }
 
           gl.uniform4f(uScale, scale, zoom, panX, panY);
+
           gl.activeTexture(unit);
           gl.bindTexture(gl.TEXTURE_2D, texture);
+          gl.uniform1i(gl.getUniformLocation(program, "uSampler"), textureUnit);
+
           gl.uniform3f(
             uBasePosition,
             basePosition[0],
