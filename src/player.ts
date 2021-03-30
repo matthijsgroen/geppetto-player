@@ -56,7 +56,7 @@ export type GeppettoPlayer = {
 };
 
 export const setupWebGL = (element: HTMLCanvasElement): GeppettoPlayer => {
-  const gl = element.getContext("webgl2", {
+  const gl = element.getContext("webgl", {
     premultipliedalpha: true,
     depth: true,
     antialias: true,
@@ -157,7 +157,7 @@ const setupTexture = (
 };
 
 export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
-  const gl = element.getContext("webgl2", {
+  const gl = element.getContext("webgl", {
     premultipliedalpha: true,
     depth: true,
     antialias: true,
