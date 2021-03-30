@@ -5,13 +5,12 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -29,4 +28,5 @@ jobs:
       run: yarn
     - name: Run tests
       run: yarn test
-    
+      - name: Size limit
+        run: yarn size
