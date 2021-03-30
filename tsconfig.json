@@ -7,10 +7,9 @@
     "module": "commonjs",                           
     "declaration": true,
     "sourceMap": true,           
-    "outDir": "./dist/",
+    "outDir": "./dist-ts/",
     "rootDir": "./src/",
     "removeComments": true,
-    "emitDeclarationOnly": true,
 
     // /* Strict Type-Checking Options */
     "strict": true,

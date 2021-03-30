@@ -133,9 +133,11 @@ export const createMutationList = (
   };
 };
 
-const convertAnimations = (imageDefinition: ImageDefinition): Animation[] => {
+const convertAnimations = (
+  imageDefinition: ImageDefinition
+): PreparedImage[] => {
   const controlNames = imageDefinition.controls.map((c) => c.name);
-  return imageDefinition.animations.map<Animation>((a) => {
+  return imageDefinition.animations.map<PreparedImage>((a) => {
     const tracks: [number, Float32Array][] = [];
 
     const trackControls = a.keyframes
@@ -168,12 +170,12 @@ const convertAnimations = (imageDefinition: ImageDefinition): Animation[] => {
   });
 };
 
-export type Control = {
+export type PreparedControl = {
   name: string;
   steps: number;
 };
 
-export type Shape = {
+export type PreparedShape = {
   name: string;
   start: number;
   amount: number;
@@ -183,14 +185,14 @@ export type Shape = {
   z: number;
 };
 
-export type Animation = {
+export type PreparedImage = {
   name: string;
   duration: number;
   looping: boolean;
   tracks: [number, Float32Array][];
 };
 
-export type PreparedAnimation = {
+export type PreparedImageDefinition = {
   mutators: PreparedFloatBuffer;
   mutatorParents: PreparedIntBuffer;
   mutationValues: PreparedFloatBuffer;
@@ -199,11 +201,11 @@ export type PreparedAnimation = {
   controlMutationIndices: PreparedIntBuffer;
   shapeVertices: PreparedFloatBuffer;
   shapeIndices: Uint16Array;
-  shapes: Shape[];
+  shapes: PreparedShape[];
   maxIteration: number;
-  controls: Control[];
+  controls: PreparedControl[];
   defaultControlValues: Float32Array;
-  animations: Animation[];
+  animations: PreparedImage[];
 };
 
 /**
@@ -214,8 +216,8 @@ export type PreparedAnimation = {
  */
 export const prepareAnimation = (
   imageDefinition: ImageDefinition
-): PreparedAnimation => {
-  const elements: Shape[] = [];
+): PreparedImageDefinition => {
+  const elements: PreparedShape[] = [];
   const vertices: Vec4[] = [];
   const indices: number[] = [];
 
@@ -249,7 +251,7 @@ export const prepareAnimation = (
   const mutatorInfo = createMutationList(imageDefinition.shapes);
   const mutatorCount = mutatorInfo.parentList.length;
   const mutators = Object.keys(mutatorInfo.mutatorMapping);
-  const controls: Control[] = [];
+  const controls: PreparedControl[] = [];
 
   const mutationValues = new Float32Array(mutatorCount * 2);
   Object.entries(imageDefinition.defaultFrame).forEach(([key, value]) => {

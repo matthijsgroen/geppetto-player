@@ -1,6 +1,6 @@
-import { PreparedAnimation } from "src/prepareAnimation";
+import { PreparedImageDefinition } from "src/prepareAnimation";
 
-const mutationControlShader = (animation: PreparedAnimation) => `
+const mutationControlShader = (animation: PreparedImageDefinition) => `
   uniform vec2 uControlMutationValues[${animation.controlMutationValues.length}];
   uniform vec3 uMutationValueIndices[${animation.mutationValueIndices.length}];
   uniform vec2 uControlMutationIndices[${animation.controlMutationIndices.length}];
@@ -111,7 +111,9 @@ const mutationShader = (maxMutationVectors: number) => `
 
 `;
 
-export const animationVertexShader = (animation: PreparedAnimation): string => `
+export const animationVertexShader = (
+  animation: PreparedImageDefinition
+): string => `
   uniform vec2 viewport;
   uniform vec3 basePosition;
   uniform vec3 translate;

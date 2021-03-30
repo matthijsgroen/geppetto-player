@@ -58,11 +58,6 @@ export type FolderDefinition = {
 
 export type ShapeDefinition = FolderDefinition | SpriteDefinition;
 
-export type ItemSelection = {
-  name: string;
-  type: "layer" | "vector" | "control";
-};
-
 export type Keyframe = Record<string, Vec2>;
 
 export type ControlDefinition = {
@@ -95,6 +90,9 @@ export type Animation = {
   keyframes: AnimationFrame[];
 };
 
+/**
+ * File format from Geppetto
+ */
 export type ImageDefinition = {
   shapes: ShapeDefinition[];
   defaultFrame: Keyframe;

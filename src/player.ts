@@ -1,5 +1,5 @@
 import { PreparedFloatBuffer, PreparedIntBuffer } from "./buffer";
-import { PreparedAnimation } from "./prepareAnimation";
+import { PreparedImageDefinition } from "./prepareAnimation";
 import { animationFragmentShader } from "./shaders/fragmentShader";
 import { animationVertexShader } from "./shaders/vertexShader";
 import { interpolateFloat } from "./vertices";
@@ -50,10 +50,18 @@ type PlayStatus = {
   startedAt: number;
 };
 
+/**
+ * A player to add Gepetto animations to.
+ */
 export type GeppettoPlayer = {
+  /**
+   * Clears the canvas. Use this when you created the player with {@link setupWebGL}.
+   * If you want to control the rendering process (and the clearing of the canvas) yourself,
+   * skip the call to this method in your render cycle.
+   */
   render: () => void;
   addAnimation(
-    animation: PreparedAnimation,
+    animation: PreparedImageDefinition,
     image: HTMLImageElement,
     textureUnit: number,
     options?: Partial<AnimationOptions>
@@ -61,6 +69,15 @@ export type GeppettoPlayer = {
   destroy: () => void;
 };
 
+/**
+ * Initializes the WebGL Context of a provided context. Configures the context and returns
+ * a GeppettoPlayer bound to this element.
+ *
+ * Use this method if you only render Geppetto Animations in your Canvas.
+ * Use {@link createPlayer} if you want your own control over the canvas configuration
+ *
+ * @param element the Canvas DOM element that is not yet initialized with a context
+ */
 export const setupWebGL = (element: HTMLCanvasElement): GeppettoPlayer => {
   const gl = element.getContext("webgl", {
     premultipliedalpha: true,
@@ -83,7 +100,7 @@ export const setupWebGL = (element: HTMLCanvasElement): GeppettoPlayer => {
 
 const setupWebGLProgram = (
   gl: WebGLRenderingContext,
-  animation: PreparedAnimation
+  animation: PreparedImageDefinition
 ): [WebGLProgram, WebGLShader, WebGLShader] => {
   const program = gl.createProgram();
   if (!program) throw new Error("Failed to create shader program");
@@ -160,6 +177,13 @@ const setupTexture = (
   return texture;
 };
 
+/**
+ * Initializes a player to display in an existing WebGL Environment.
+ * Use this function to create a player if you want to have full control over the
+ * rendering process (possibly to combine with other render code).
+ *
+ * @param element the Canvas DOM element containing a WebGL Context
+ */
 export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
   const gl = element.getContext("webgl", {
     premultipliedalpha: true,

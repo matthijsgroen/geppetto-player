@@ -9,7 +9,9 @@
   "license": "MIT",
   "private": false,
   "scripts": {
+    "prebuild": "tsc --noEmit",
     "build": "parcel build ./src/index.ts",
+    "build-docs": "typedoc src/index.ts --includeVersion --name 'Geppetto Player'",
     "test": "jest",
     "lint": "eslint src/",
     "presize": "yarn build",
@@ -49,6 +51,7 @@
     "prettier": "^2.2.1",
     "size-limit": "^4.10.1",
     "ts-jest": "^26.5.4",
+    "typedoc": "^0.20.34",
     "typescript": "^4.2.3"
   },
   "files": [
