@@ -10,7 +10,11 @@
   "private": false,
   "scripts": {
     "build": "parcel build ./src/index.ts",
-    "test": "jest"
+    "test": "jest",
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
   },
   "devDependencies": {
     "@parcel/packager-ts": "2.0.0-beta.2",
