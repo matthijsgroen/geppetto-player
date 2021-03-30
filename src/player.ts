@@ -6,6 +6,14 @@ import { interpolateFloat } from "./vertices";
 
 type Unsubscribe = () => void;
 
+type TrackStoppedCallback = (track: string) => void;
+type CustomEventCallback = (
+  eventName: string,
+  track: string,
+  time: number
+) => void;
+type ControlChangeCallback = (control: number, value: number) => void;
+
 export type AnimationControls = {
   destroy(): void;
   setLooping(loop: boolean, track: string): void;
@@ -15,13 +23,9 @@ export type AnimationControls = {
   setPanning(panX: number, panY: number): void;
   setZoom(zoom: number): void;
 
-  onTrackStopped(callback: (track: string) => void): Unsubscribe;
-  onEvent(
-    callback: (eventName: string, track: string, time: number) => void
-  ): Unsubscribe;
-  onControlChange(
-    callback: (control: number, value: number) => void
-  ): Unsubscribe;
+  onTrackStopped(callback: TrackStoppedCallback): Unsubscribe;
+  onEvent(callback: CustomEventCallback): Unsubscribe;
+  onControlChange(callback: ControlChangeCallback): Unsubscribe;
   render: () => void;
 };
 
@@ -165,6 +169,9 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
   }) as WebGLRenderingContext;
 
   const animations: AnimationControls[] = [];
+  let onTrackStoppedListeners: TrackStoppedCallback[] = [];
+  let onCustomEventListeners: CustomEventCallback[] = [];
+  let onControlChangeListeners: ControlChangeCallback[] = [];
 
   return {
     render: () => {
@@ -263,7 +270,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
         playingAnimations.splice(playingIndex, 1);
 
         // place current active control values in control values list
-        for (let [controlIndex, track] of playingAnimation.tracks) {
+        for (const [controlIndex, track] of playingAnimation.tracks) {
           const value = interpolateFloat(
             track,
             playTime,
@@ -381,7 +388,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
           );
 
           const now = +new Date();
-          for (let playing of playingAnimations) {
+          for (const playing of playingAnimations) {
             const playTime = now - playing.startedAt + playing.startAt;
             // events in previous timespan?? event emitting here.
             const playingAnimation = animation.animations[playing.index];
@@ -390,7 +397,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
               playingAnimation.duration < playTime &&
               !looping[playing.index]
             ) {
-              for (let [controlIndex, track] of playingAnimation.tracks) {
+              for (const [controlIndex, track] of playingAnimation.tracks) {
                 const value = interpolateFloat(
                   track,
                   playTime,
@@ -404,7 +411,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             }
 
             const playPosition = playTime % playingAnimation.duration;
-            for (let [controlIndex, track] of playingAnimation.tracks) {
+            for (const [controlIndex, track] of playingAnimation.tracks) {
               const value = interpolateFloat(
                 track,
                 playPosition,
@@ -416,7 +423,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
 
           gl.uniform1fv(uControlValues, renderControlValues);
 
-          for (let shape of animation.shapes) {
+          for (const shape of animation.shapes) {
             gl.uniform3f(uTranslate, shape.x, shape.y, shape.z);
             gl.uniform1f(uMutation, shape.mutator);
             gl.drawElements(
@@ -427,14 +434,29 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             );
           }
         },
-        onTrackStopped() {
-          return () => {};
+        onTrackStopped(callback) {
+          onTrackStoppedListeners = onTrackStoppedListeners.concat(callback);
+          return () => {
+            onTrackStoppedListeners = onTrackStoppedListeners.filter(
+              (item) => item !== callback
+            );
+          };
         },
-        onEvent() {
-          return () => {};
+        onEvent(callback) {
+          onCustomEventListeners = onCustomEventListeners.concat(callback);
+          return () => {
+            onCustomEventListeners = onCustomEventListeners.filter(
+              (item) => item !== callback
+            );
+          };
         },
-        onControlChange() {
-          return () => {};
+        onControlChange(callback) {
+          onControlChangeListeners = onControlChangeListeners.concat(callback);
+          return () => {
+            onControlChangeListeners = onControlChangeListeners.filter(
+              (item) => item !== callback
+            );
+          };
         },
       };
       animations.push(newAnimation);
@@ -442,7 +464,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
       return newAnimation;
     },
     destroy() {
-      for (let anim of animations) {
+      for (const anim of animations) {
         anim.destroy();
       }
       animations.length = 0;

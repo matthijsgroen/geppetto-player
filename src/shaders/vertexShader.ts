@@ -111,7 +111,7 @@ const mutationShader = (maxMutationVectors: number) => `
 
 `;
 
-export const animationVertexShader = (animation: PreparedAnimation) => `
+export const animationVertexShader = (animation: PreparedAnimation): string => `
   uniform vec2 viewport;
   uniform vec3 basePosition;
   uniform vec3 translate;

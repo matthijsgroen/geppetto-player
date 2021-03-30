@@ -23,9 +23,9 @@ export const walkShapes = (
   ) => void,
   parents: (ShapeDefinition | MutationVector)[] = []
 ): void => {
-  for (let shape of shapes) {
+  for (const shape of shapes) {
     visitor(shape, parents);
-    for (let mutator of shape.mutationVectors) {
+    for (const mutator of shape.mutationVectors) {
       visitor(mutator, [...parents, shape]);
     }
     if (shape.type === "folder") {

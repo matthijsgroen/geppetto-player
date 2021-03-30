@@ -1,4 +1,4 @@
-export const animationFragmentShader = () => `
+export const animationFragmentShader = (): string => `
 precision mediump float;
 
 varying mediump vec2 vTextureCoord;
