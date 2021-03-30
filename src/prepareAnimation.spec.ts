@@ -253,11 +253,12 @@ describe("prepareAnimation", () => {
       expect(animations).toEqual([
         {
           name: "AnimationTrack",
+          duration: 6200,
           looping: false,
-          tracks: {
-            "0": new Float32Array([2000, 0, 4000, 0.7, 6200, 1.0]),
-            "1": new Float32Array([2000, 0.4, 6200, 1.0]),
-          },
+          tracks: [
+            [0, new Float32Array([2000, 0, 4000, 0.7, 6200, 1.0])],
+            [1, new Float32Array([2000, 0.4, 6200, 1.0])],
+          ],
         },
       ]);
     });

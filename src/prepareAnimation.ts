@@ -161,8 +161,8 @@ const convertAnimations = (imageDefinition: ImageDefinition): Animation[] => {
 
     return {
       name: a.name,
-      looping: a.looping,
       duration: a.keyframes[a.keyframes.length - 1].time,
+      looping: a.looping,
       tracks,
     };
   });
@@ -185,9 +185,9 @@ export type Shape = {
 
 export type Animation = {
   name: string;
+  duration: number;
   looping: boolean;
   tracks: [number, Float32Array][];
-  duration: number;
 };
 
 export type PreparedAnimation = {
