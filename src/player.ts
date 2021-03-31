@@ -14,25 +14,99 @@ type CustomEventCallback = (
 ) => void;
 type ControlChangeCallback = (control: number, value: number) => void;
 
+/**
+ * Options to control the animation, start animation tracks, etc.
+ */
 export type AnimationControls = {
-  destroy(): void;
+  /**
+   * Render a frame of the image.
+   */
+  render: () => void;
+
+  /**
+   * Set the looping state of an animation track.
+   *
+   * The default value is based on how the animation is build.
+   *
+   * @param loop true for looping, false to stop looping.
+   * @param track the name of the animation track to adjust.
+   */
   setLooping(loop: boolean, track: string): void;
+
+  /**
+   * Start an animation. Conflicting animations will be automatically stopped.
+   *
+   * @param track the name of the animation track to start.
+   * If the name is not valid, an exception will be thrown
+   * indicating what animation names are available.
+   */
   startTrack(track: string): void;
+
+  /**
+   * Stop an animation.
+   *
+   * @param track the name of the animation track to start.
+   * If the name is not valid, an exception will be thrown
+   * indicating what animation names are available.
+   */
   stopTrack(track: string): void;
+
   setControlValue(control: string, value: number): void;
+
+  /**
+   * Update the panning of the animation.
+   *
+   * @param panX value of horizontal panning. See {@link AnimationOptions.panX}
+   * @param panY value of vertical panning. See {@link AnimationOptions.panY}
+   */
   setPanning(panX: number, panY: number): void;
+
+  /**
+   * Update the zoom
+   *
+   * @param zoom See {@link AnimationOptions.zoom}
+   */
   setZoom(zoom: number): void;
+  setZIndex(zIndex: number): void;
 
   onTrackStopped(callback: TrackStoppedCallback): Unsubscribe;
   onEvent(callback: CustomEventCallback): Unsubscribe;
   onControlChange(callback: ControlChangeCallback): Unsubscribe;
-  render: () => void;
+
+  /**
+   * Clears all memory associated to this animation.
+   */
+  destroy(): void;
 };
 
+/**
+ * Options to set directly when adding an animation.
+ */
 export interface AnimationOptions {
+  /**
+   * Horizontal position of image in canvas. `0` = center, `-1` = left, `1` = right.
+   *
+   * @default 0.0
+   */
   panX: number;
+  /**
+   * Vertical position of image in canvas. `0` = center, `-1` = bottom, `1` = top.
+   *
+   * @default 0.0
+   */
   panY: number;
+  /**
+   * Zoom level. `1` = 100%, `1.5` is 150%, `0.5` = 50% zoom.
+   *
+   * @default 1.0
+   */
   zoom: number;
+  /**
+   * Adds a stacking order to the rendering elements, this helps when
+   * stacking multiple animations on top of eachother.
+   *
+   * @default 0
+   */
   zIndex: number;
 }
 
@@ -40,7 +114,7 @@ const DEFAULT_OPTIONS: AnimationOptions = {
   zoom: 1.0,
   panX: 0.0,
   panY: 0.0,
-  zIndex: 1,
+  zIndex: 0,
 };
 
 type PlayStatus = {
@@ -61,6 +135,15 @@ export type GeppettoPlayer = {
    */
   render: () => void;
 
+  /**
+   * Add a Geppetto animation to the player.
+   *
+   * @param animation an animation prepared with {@link prepareAnimation}.
+   * @param image a HTML Image element with loaded url to use as texture.
+   * @param textureUnit The texture unit to use you can use `0` for your first animation,
+   * `1` for your second, etc.
+   * @param options
+   */
   addAnimation(
     animation: PreparedImageDefinition,
     image: HTMLImageElement,
@@ -274,7 +357,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
         cHeight = 0;
 
       let { zoom, panX, panY, zIndex } = { ...DEFAULT_OPTIONS, ...options };
-      let basePosition = [0, 0, zIndex * 0.01];
+      let basePosition = [0, 0];
       let scale = 1.0;
 
       const playingAnimations: PlayStatus[] = [];
@@ -368,6 +451,9 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
         setZoom(newZoom) {
           zoom = newZoom;
         },
+        setZIndex(newZIndex) {
+          zIndex = newZIndex;
+        },
         render() {
           gl.useProgram(program);
           gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -404,11 +490,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
 
             gl.uniform2f(uViewport, canvasWidth, canvasHeight);
 
-            basePosition = [
-              canvasWidth / 2 / scale,
-              canvasHeight / 2 / scale,
-              zIndex * 0.01,
-            ];
+            basePosition = [canvasWidth / 2 / scale, canvasHeight / 2 / scale];
             cWidth = element.width;
             cHeight = element.height;
           }
@@ -423,7 +505,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             uBasePosition,
             basePosition[0],
             basePosition[1],
-            basePosition[2]
+            zIndex * 0.01
           );
 
           const now = +new Date();
