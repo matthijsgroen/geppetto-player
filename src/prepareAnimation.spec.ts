@@ -3,6 +3,7 @@ import { ImageDefinition } from "./types";
 
 describe("prepareAnimation", () => {
   const imageDefinition: ImageDefinition = {
+    version: "1.0",
     shapes: [
       {
         name: "Folder",
@@ -261,6 +262,22 @@ describe("prepareAnimation", () => {
           ],
         },
       ]);
+    });
+  });
+
+  describe("version checking", () => {
+    it("supports version 1.0", () => {
+      const file = { ...imageDefinition, version: "1.0" };
+      expect(() => {
+        prepareAnimation(file);
+      }).not.toThrowError("Only version 1.0 files are supported");
+    });
+
+    it.each(["1.1", "2.0"])("Rejects other versions (%s)", (version) => {
+      const file = { ...imageDefinition, version };
+      expect(() => {
+        prepareAnimation(file);
+      }).toThrowError("Only version 1.0 files are supported");
     });
   });
 });

@@ -94,9 +94,10 @@ export type Animation = {
  * File format from Geppetto
  */
 export type ImageDefinition = {
-  shapes: ShapeDefinition[];
-  defaultFrame: Keyframe;
-  controls: ControlDefinition[];
-  controlValues: ControlValues;
   animations: Animation[];
+  controlValues: ControlValues;
+  controls: ControlDefinition[];
+  defaultFrame: Keyframe;
+  shapes: ShapeDefinition[];
+  version: string;
 };

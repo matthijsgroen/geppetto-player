@@ -362,6 +362,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
 
       const playingAnimations: PlayStatus[] = [];
       const trackNames = animation.animations.map((a) => a.name);
+      const controlNames = animation.controls.map((a) => a.name);
       const looping: boolean[] = animation.animations.map((a) => a.looping);
 
       const stopTrack = (track: string): void => {
@@ -401,9 +402,29 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
 
         // events in previous timespan?? event emitting here.
       };
-      const setControlValue = () => {
+      const setControlValue: AnimationControls["setControlValue"] = (
+        control,
+        value
+      ) => {
+        const controlIndex = controlNames.indexOf(control);
+
+        if (controlIndex === -1) {
+          throw new Error(
+            `Control ${control} does not exist in ${controlNames.join(",")}`
+          );
+        }
+        const maxValue = animation.controls[controlIndex].steps - 1;
+        if (value < 0 || value > maxValue) {
+          throw new Error(
+            `Control ${control} value shoulde be between 0 and ${maxValue}. ${value} is out of bounds.`
+          );
+        }
+
+        controlValues[controlIndex] = value;
         // stop all conflicting tracks
-        // emit control change event
+        for (const listener of onControlChangeListeners) {
+          listener(controlIndex, value);
+        }
       };
 
       const newAnimation: AnimationControls = {
@@ -507,6 +528,8 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             basePosition[1],
             zIndex * 0.01
           );
+
+          renderControlValues.set(controlValues, 0);
 
           const now = +new Date();
           for (const playing of playingAnimations) {

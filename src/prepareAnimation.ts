@@ -217,6 +217,10 @@ export type PreparedImageDefinition = {
 export const prepareAnimation = (
   imageDefinition: ImageDefinition
 ): PreparedImageDefinition => {
+  if (imageDefinition.version !== "1.0") {
+    throw new Error("Only version 1.0 files are supported");
+  }
+
   const elements: PreparedShape[] = [];
   const vertices: Vec4[] = [];
   const indices: number[] = [];
