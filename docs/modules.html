@@ -72,6 +72,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-type-alias"><a href="modules.html#animationcontrols" class="tsd-kind-icon">Animation<wbr>Controls</a></li>
 								<li class="tsd-kind-type-alias"><a href="modules.html#geppettoplayer" class="tsd-kind-icon">Geppetto<wbr>Player</a></li>
+								<li class="tsd-kind-type-alias"><a href="modules.html#unsubscribe" class="tsd-kind-icon">Unsubscribe</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -90,10 +91,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-type-alias">
 					<a name="animationcontrols" class="tsd-anchor"></a>
 					<h3>Animation<wbr>Controls</h3>
-					<div class="tsd-signature tsd-kind-icon">Animation<wbr>Controls<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>render<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">; </span>destroy<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>onControlChange<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>onEvent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>onTrackStopped<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>setControlValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>setLooping<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>setPanning<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>setZIndex<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>setZoom<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>startTrack<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>stopTrack<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> }</span></div>
+					<div class="tsd-signature tsd-kind-icon">Animation<wbr>Controls<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>render<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">; </span>destroy<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>onEvent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>onTrackStopped<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>setControlValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>setLooping<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>setPanning<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>setZIndex<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>setZoom<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>startTrack<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>stopTrack<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L20">player.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L22">player.ts:22</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -133,7 +134,7 @@
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L79">player.ts:79</a></li>
+												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L87">player.ts:87</a></li>
 											</ul>
 										</aside>
 										<div class="tsd-comment tsd-typography">
@@ -146,37 +147,15 @@
 								</ul>
 							</li>
 							<li class="tsd-parameter">
-								<h5>on<wbr>Control<wbr>Change<span class="tsd-signature-symbol">: </span>function</h5>
-								<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-type-literal">
-									<li class="tsd-signature tsd-kind-icon">on<wbr>Control<wbr>Change<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ControlChangeCallback</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Unsubscribe</span></li>
-								</ul>
-								<ul class="tsd-descriptions">
-									<li class="tsd-description">
-										<aside class="tsd-sources">
-											<ul>
-												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L74">player.ts:74</a></li>
-											</ul>
-										</aside>
-										<h4 class="tsd-parameters-title">Parameters</h4>
-										<ul class="tsd-parameters">
-											<li>
-												<h5>callback: <span class="tsd-signature-type">ControlChangeCallback</span></h5>
-											</li>
-										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Unsubscribe</span></h4>
-									</li>
-								</ul>
-							</li>
-							<li class="tsd-parameter">
 								<h5>on<wbr>Event<span class="tsd-signature-symbol">: </span>function</h5>
 								<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-type-literal">
-									<li class="tsd-signature tsd-kind-icon">on<wbr>Event<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CustomEventCallback</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Unsubscribe</span></li>
+									<li class="tsd-signature tsd-kind-icon">on<wbr>Event<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CustomEventCallback</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="modules.html#unsubscribe" class="tsd-signature-type" data-tsd-kind="Type alias">Unsubscribe</a></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L73">player.ts:73</a></li>
+												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L82">player.ts:82</a></li>
 											</ul>
 										</aside>
 										<h4 class="tsd-parameters-title">Parameters</h4>
@@ -185,20 +164,20 @@
 												<h5>callback: <span class="tsd-signature-type">CustomEventCallback</span></h5>
 											</li>
 										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Unsubscribe</span></h4>
+										<h4 class="tsd-returns-title">Returns <a href="modules.html#unsubscribe" class="tsd-signature-type" data-tsd-kind="Type alias">Unsubscribe</a></h4>
 									</li>
 								</ul>
 							</li>
 							<li class="tsd-parameter">
 								<h5>on<wbr>Track<wbr>Stopped<span class="tsd-signature-symbol">: </span>function</h5>
 								<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-type-literal">
-									<li class="tsd-signature tsd-kind-icon">on<wbr>Track<wbr>Stopped<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TrackStoppedCallback</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Unsubscribe</span></li>
+									<li class="tsd-signature tsd-kind-icon">on<wbr>Track<wbr>Stopped<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TrackStoppedCallback</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="modules.html#unsubscribe" class="tsd-signature-type" data-tsd-kind="Type alias">Unsubscribe</a></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L72">player.ts:72</a></li>
+												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L81">player.ts:81</a></li>
 											</ul>
 										</aside>
 										<h4 class="tsd-parameters-title">Parameters</h4>
@@ -207,7 +186,7 @@
 												<h5>callback: <span class="tsd-signature-type">TrackStoppedCallback</span></h5>
 											</li>
 										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Unsubscribe</span></h4>
+										<h4 class="tsd-returns-title">Returns <a href="modules.html#unsubscribe" class="tsd-signature-type" data-tsd-kind="Type alias">Unsubscribe</a></h4>
 									</li>
 								</ul>
 							</li>
@@ -220,16 +199,28 @@
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L54">player.ts:54</a></li>
+												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L63">player.ts:63</a></li>
 											</ul>
 										</aside>
+										<div class="tsd-comment tsd-typography">
+											<div class="lead">
+												<p>Manipulates a control. Will stop animations that are using this control as well.</p>
+											</div>
+										</div>
 										<h4 class="tsd-parameters-title">Parameters</h4>
 										<ul class="tsd-parameters">
 											<li>
 												<h5>control: <span class="tsd-signature-type">string</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<p>name of the control to change</p>
+												</div>
 											</li>
 											<li>
 												<h5>value: <span class="tsd-signature-type">number</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<p>value to set for control. Take into account that each control can have different
+													value limits, depending on the amount of step a control has.</p>
+												</div>
 											</li>
 										</ul>
 										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -245,7 +236,7 @@
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L34">player.ts:34</a></li>
+												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L36">player.ts:36</a></li>
 											</ul>
 										</aside>
 										<div class="tsd-comment tsd-typography">
@@ -282,7 +273,7 @@
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L62">player.ts:62</a></li>
+												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L71">player.ts:71</a></li>
 											</ul>
 										</aside>
 										<div class="tsd-comment tsd-typography">
@@ -318,7 +309,7 @@
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L70">player.ts:70</a></li>
+												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L79">player.ts:79</a></li>
 											</ul>
 										</aside>
 										<h4 class="tsd-parameters-title">Parameters</h4>
@@ -340,7 +331,7 @@
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L69">player.ts:69</a></li>
+												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L78">player.ts:78</a></li>
 											</ul>
 										</aside>
 										<div class="tsd-comment tsd-typography">
@@ -370,7 +361,7 @@
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L43">player.ts:43</a></li>
+												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L45">player.ts:45</a></li>
 											</ul>
 										</aside>
 										<div class="tsd-comment tsd-typography">
@@ -402,7 +393,7 @@
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L52">player.ts:52</a></li>
+												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L54">player.ts:54</a></li>
 											</ul>
 										</aside>
 										<div class="tsd-comment tsd-typography">
@@ -434,7 +425,7 @@
 					<div class="tsd-signature tsd-kind-icon">Geppetto<wbr>Player<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>destroy<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">; </span>render<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">; </span>addAnimation<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L130">player.ts:130</a></li>
+							<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L138">player.ts:138</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -496,7 +487,7 @@
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L147">player.ts:147</a></li>
+												<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L155">player.ts:155</a></li>
 											</ul>
 										</aside>
 										<div class="tsd-comment tsd-typography">
@@ -538,6 +529,36 @@
 						</ul>
 					</div>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="unsubscribe" class="tsd-anchor"></a>
+					<h3>Unsubscribe</h3>
+					<div class="tsd-signature tsd-kind-icon">Unsubscribe<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L10">player.ts:10</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Function to call for unsubscribing to an event listener</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
@@ -551,7 +572,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L275">player.ts:275</a></li>
+									<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L283">player.ts:283</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -584,7 +605,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/prepareAnimation.ts#L217">prepareAnimation.ts:217</a></li>
+									<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/prepareAnimation.ts#L217">prepareAnimation.ts:217</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -613,7 +634,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/2376a4e/src/player.ts#L169">player.ts:169</a></li>
+									<li>Defined in <a href="https://github.com/matthijsgroen/geppetto-player/blob/24edd55/src/player.ts#L177">player.ts:177</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -657,6 +678,9 @@
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="modules.html#geppettoplayer" class="tsd-kind-icon">Geppetto<wbr>Player</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#unsubscribe" class="tsd-kind-icon">Unsubscribe</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#createplayer" class="tsd-kind-icon">create<wbr>Player</a>

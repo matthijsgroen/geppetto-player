@@ -4,7 +4,10 @@ import { animationFragmentShader } from "./shaders/fragmentShader";
 import { animationVertexShader } from "./shaders/vertexShader";
 import { interpolateFloat } from "./vertices";
 
-type Unsubscribe = () => void;
+/**
+ * Function to call for unsubscribing to an event listener
+ */
+export type Unsubscribe = () => void;
 
 type TrackStoppedCallback = (track: string) => void;
 type CustomEventCallback = (
@@ -12,7 +15,6 @@ type CustomEventCallback = (
   track: string,
   time: number
 ) => void;
-type ControlChangeCallback = (control: number, value: number) => void;
 
 /**
  * Options to control the animation, start animation tracks, etc.
@@ -51,6 +53,13 @@ export type AnimationControls = {
    */
   stopTrack(track: string): void;
 
+  /**
+   * Manipulates a control. Will stop animations that are using this control as well.
+   *
+   * @param control name of the control to change
+   * @param value value to set for control. Take into account that each control can have different
+   * value limits, depending on the amount of step a control has.
+   */
   setControlValue(control: string, value: number): void;
 
   /**
@@ -71,7 +80,6 @@ export type AnimationControls = {
 
   onTrackStopped(callback: TrackStoppedCallback): Unsubscribe;
   onEvent(callback: CustomEventCallback): Unsubscribe;
-  onControlChange(callback: ControlChangeCallback): Unsubscribe;
 
   /**
    * Clears all memory associated to this animation.
@@ -283,7 +291,6 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
   const animations: AnimationControls[] = [];
   let onTrackStoppedListeners: TrackStoppedCallback[] = [];
   let onCustomEventListeners: CustomEventCallback[] = [];
-  let onControlChangeListeners: ControlChangeCallback[] = [];
 
   return {
     render: () => {
@@ -394,13 +401,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             controlValues[controlIndex]
           );
           controlValues[controlIndex] = value;
-          // emit control change event
-          for (const listener of onControlChangeListeners) {
-            listener(controlIndex, value);
-          }
         }
-
-        // events in previous timespan?? event emitting here.
       };
       const setControlValue: AnimationControls["setControlValue"] = (
         control,
@@ -419,12 +420,19 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             `Control ${control} value shoulde be between 0 and ${maxValue}. ${value} is out of bounds.`
           );
         }
+        // stop all conflicting tracks
+        for (const playing of playingAnimations) {
+          const playingAnimation = animation.animations[playing.index];
+          if (
+            playingAnimation.tracks.some(
+              ([controlNr]) => controlNr === controlIndex
+            )
+          ) {
+            stopTrack(trackNames[playing.index]);
+          }
+        }
 
         controlValues[controlIndex] = value;
-        // stop all conflicting tracks
-        for (const listener of onControlChangeListeners) {
-          listener(controlIndex, value);
-        }
       };
 
       const newAnimation: AnimationControls = {
@@ -453,8 +461,21 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
               `Track ${track} does not exist in ${trackNames.join(",")}`
             );
           }
+          const animationControls = animation.animations[trackIndex].tracks.map(
+            ([controlNr]) => controlNr
+          );
 
           // stop all conflicting tracks
+          for (const playing of playingAnimations) {
+            const playingAnimation = animation.animations[playing.index];
+            if (
+              playingAnimation.tracks.some(([controlNr]) =>
+                animationControls.includes(controlNr)
+              )
+            ) {
+              stopTrack(trackNames[playing.index]);
+            }
+          }
 
           playingAnimations.push({
             name: track,
@@ -541,16 +562,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
               playingAnimation.duration < playTime &&
               !looping[playing.index]
             ) {
-              for (const [controlIndex, track] of playingAnimation.tracks) {
-                const value = interpolateFloat(
-                  track,
-                  playTime,
-                  controlValues[controlIndex]
-                );
-                renderControlValues[controlIndex] = value;
-              }
-              // stop track
-
+              stopTrack(playingAnimation.name);
               continue;
             }
 
@@ -590,14 +602,6 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
           onCustomEventListeners = onCustomEventListeners.concat(callback);
           return () => {
             onCustomEventListeners = onCustomEventListeners.filter(
-              (item) => item !== callback
-            );
-          };
-        },
-        onControlChange(callback) {
-          onControlChangeListeners = onControlChangeListeners.concat(callback);
-          return () => {
-            onControlChangeListeners = onControlChangeListeners.filter(
               (item) => item !== callback
             );
           };

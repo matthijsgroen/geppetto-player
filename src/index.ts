@@ -4,4 +4,5 @@ export type {
   GeppettoPlayer,
   AnimationControls,
   AnimationOptions,
+  Unsubscribe,
 } from "./player";
