@@ -99,6 +99,11 @@ describe("prepareAnimation", () => {
             },
           },
           {
+            time: 2500,
+            event: "MyCustomEvent",
+            controlValues: {},
+          },
+          {
             time: 4000,
             controlValues: {
               Control1: 0.7,
@@ -260,6 +265,7 @@ describe("prepareAnimation", () => {
             [0, new Float32Array([2000, 0, 4000, 0.7, 6200, 1.0])],
             [1, new Float32Array([2000, 0.4, 6200, 1.0])],
           ],
+          events: [[2500, "MyCustomEvent"]],
         },
       ]);
     });

@@ -135,16 +135,19 @@ export const createMutationList = (
 
 const convertAnimations = (
   imageDefinition: ImageDefinition
-): PreparedImage[] => {
+): PreparedAnimation[] => {
   const controlNames = imageDefinition.controls.map((c) => c.name);
-  return imageDefinition.animations.map<PreparedImage>((a) => {
+  return imageDefinition.animations.map<PreparedAnimation>((a) => {
     const tracks: [number, Float32Array][] = [];
+    const events: [number, string][] = [];
 
     const trackControls = a.keyframes
-      .reduce<string[]>(
-        (result, frame) => result.concat(Object.keys(frame.controlValues)),
-        []
-      )
+      .reduce<string[]>((result, frame) => {
+        if (frame.event) {
+          events.push([frame.time, frame.event]);
+        }
+        return result.concat(Object.keys(frame.controlValues));
+      }, [])
       .filter((v, i, l) => l.indexOf(v) === i);
 
     trackControls.forEach((controlName) => {
@@ -166,6 +169,7 @@ const convertAnimations = (
       duration: a.keyframes[a.keyframes.length - 1].time,
       looping: a.looping,
       tracks,
+      events,
     };
   });
 };
@@ -185,11 +189,12 @@ export type PreparedShape = {
   z: number;
 };
 
-export type PreparedImage = {
+export type PreparedAnimation = {
   name: string;
   duration: number;
   looping: boolean;
   tracks: [number, Float32Array][];
+  events: [number, string][];
 };
 
 export type PreparedImageDefinition = {
@@ -205,7 +210,7 @@ export type PreparedImageDefinition = {
   maxIteration: number;
   controls: PreparedControl[];
   defaultControlValues: Float32Array;
-  animations: PreparedImage[];
+  animations: PreparedAnimation[];
 };
 
 /**

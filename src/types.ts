@@ -81,6 +81,7 @@ export type ControlValues = {
 
 export type AnimationFrame = {
   controlValues: ControlValues;
+  event?: string;
   time: number;
 };
 
