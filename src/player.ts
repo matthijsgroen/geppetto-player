@@ -1,6 +1,6 @@
 import { PreparedFloatBuffer, PreparedIntBuffer } from "./buffer";
 import { PreparedImageDefinition } from "./prepareAnimation";
-import { animationFragmentShader } from "./shaders/fragmentShader";
+import animationFragmentShader from "./shaders/fragmentShader.frag";
 import { animationVertexShader } from "./shaders/vertexShader";
 import { interpolateFloat } from "./vertices";
 
@@ -130,6 +130,8 @@ type PlayStatus = {
   index: number;
   startAt: number;
   startedAt: number;
+  iterationStartedAt: number;
+  lastRender: number;
 };
 
 /**
@@ -202,7 +204,6 @@ const setupWebGLProgram = (
   if (!program) throw new Error("Failed to create shader program");
 
   const vertexShaderSource = animationVertexShader(animation);
-  const fragmentShaderSource = animationFragmentShader();
 
   const vs = gl.createShader(gl.VERTEX_SHADER);
   const fs = gl.createShader(gl.FRAGMENT_SHADER);
@@ -214,7 +215,7 @@ const setupWebGLProgram = (
   }
 
   gl.shaderSource(vs, vertexShaderSource);
-  gl.shaderSource(fs, fragmentShaderSource);
+  gl.shaderSource(fs, animationFragmentShader);
   gl.compileShader(vs);
   gl.compileShader(fs);
 
@@ -477,11 +478,14 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             }
           }
 
+          const startAt = 0;
           playingAnimations.push({
             name: track,
             index: trackIndex,
-            startAt: 0,
+            startAt,
             startedAt: +new Date(),
+            iterationStartedAt: +new Date() - startAt,
+            lastRender: 0,
           });
         },
         stopTrack,
@@ -554,19 +558,29 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
 
           const now = +new Date();
           for (const playing of playingAnimations) {
-            const playTime = now - playing.startedAt + playing.startAt;
-            // events in previous timespan?? event emitting here.
+            const playTime = now - playing.iterationStartedAt;
             const playingAnimation = animation.animations[playing.index];
 
-            if (
-              playingAnimation.duration < playTime &&
-              !looping[playing.index]
-            ) {
-              stopTrack(playingAnimation.name);
-              continue;
+            const playPosition = playTime % playingAnimation.duration;
+
+            if (playingAnimation.duration < playTime) {
+              if (!looping[playing.index]) {
+                stopTrack(playingAnimation.name);
+                continue;
+              }
+              playing.iterationStartedAt = now - playPosition;
             }
 
-            const playPosition = playTime % playingAnimation.duration;
+            for (const [time, event] of playingAnimation.events) {
+              const absTime = playing.iterationStartedAt + time;
+              if (absTime < now && absTime > playing.lastRender) {
+                for (const handler of onCustomEventListeners) {
+                  handler(event, playing.name, time);
+                }
+              }
+            }
+            playing.lastRender = now;
+
             for (const [controlIndex, track] of playingAnimation.tracks) {
               const value = interpolateFloat(
                 track,

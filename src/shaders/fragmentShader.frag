@@ -1,4 +1,3 @@
-export const animationFragmentShader = (): string => `
 precision mediump float;
 
 varying mediump vec2 vTextureCoord;
@@ -12,4 +11,3 @@ void main(void) {
 
   gl_FragColor = vec4(texelColor.rgb * texelColor.a * vOpacity, texelColor.a * vOpacity);
 }
-`;
