@@ -1,6 +1,6 @@
 import { PreparedFloatBuffer, PreparedIntBuffer } from "./buffer";
 import { PreparedImageDefinition } from "./prepareAnimation";
-import animationFragmentShader from "./shaders/fragmentShader.frag";
+import animationFragmentShader from "./shaders/fragmentShader-min.frag";
 import { animationVertexShader } from "./shaders/vertexShader";
 import { interpolateFloat } from "./vertices";
 

@@ -1,5 +1,5 @@
 import { PreparedImageDefinition } from "src/prepareAnimation";
-import shader from "./vertexShader.vert";
+import shader from "./vertexShader-min.vert";
 
 export const animationVertexShader = (
   animation: PreparedImageDefinition
