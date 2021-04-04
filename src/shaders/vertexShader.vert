@@ -1,3 +1,4 @@
+@nomangle MAX_MUT MAX_IT uControlMutationValues uMutationValueIndices uControlMutationIndices uControlValues
 #define PI_FRAC 0.017453292519943295
 
 uniform vec2 viewport;

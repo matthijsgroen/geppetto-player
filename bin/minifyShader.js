@@ -9,22 +9,25 @@ const {
 const { basename, extname, dirname, join } = require("path");
 const { argv } = require("process");
 const util = require("util");
+const { GlslMinify } = require("webpack-glsl-minify/build/minify");
 
 const readFile = util.promisify(readFileCallback);
 const writeFile = util.promisify(writeFileCallback);
 const access = util.promisify(accessCallback);
 
-const vacuumShader = (shaderSource) =>
-  shaderSource
-    .split("\n")
-    .reduce(
-      (result, line) =>
-        result +
-        (line.startsWith("#define")
-          ? (result.endsWith("\n") ? "" : "\n") + `${line}\n`
-          : line.trim().split("//")[0]),
-      ""
-    );
+const glsl = new GlslMinify(
+  {
+    output: "sourceOnly",
+    esModule: false,
+    stripVersion: false,
+    preserveDefines: false,
+    preserveUniforms: true,
+    preserveVariables: false,
+    nomangle: false,
+  },
+  readFileCallback,
+  dirname
+);
 
 const VALID_EXTENSIONS = [".frag", ".vert", ".vs", ".fs"];
 
@@ -54,14 +57,14 @@ const start = async ([inputFile]) => {
   const targetFilename = join(targetFolder, `${baseName}-min${extension}`);
 
   const shaderSource = await readFile(inputFile, "utf8");
-  const vacuumed = vacuumShader(shaderSource);
 
-  await writeFile(targetFilename, vacuumed);
-
+  const rawGlsl = await readFile(inputFile, "utf8");
+  const minifiedGlsl = await glsl.executeAndStringify(rawGlsl);
+  await writeFile(targetFilename, minifiedGlsl);
   console.log(
     "%s %f%",
     targetFilename,
-    Math.round((vacuumed.length / shaderSource.length) * 10000) / 100
+    Math.round((minifiedGlsl.length / shaderSource.length) * 10000) / 100
   );
 };
 
