@@ -1,37 +1,33 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 
-const {
-  access: accessCallback,
+import {
+  access as accessCallback,
   constants,
-  readFile: readFileCallback,
-  writeFile: writeFileCallback,
-} = require("fs");
-const { basename, extname, dirname, join } = require("path");
-const { argv } = require("process");
-const util = require("util");
-const { GlslMinify } = require("webpack-glsl-minify/build/minify");
+  readFile as readFileCallback,
+  writeFile as writeFileCallback,
+} from "fs";
+import { basename, extname, dirname, join } from "path";
+import { argv } from "process";
+import util from "util";
+import { GlslMinify } from "webpack-glsl-minify/build/minify";
 
 const readFile = util.promisify(readFileCallback);
 const writeFile = util.promisify(writeFileCallback);
 const access = util.promisify(accessCallback);
 
-const glsl = new GlslMinify(
-  {
-    output: "sourceOnly",
-    esModule: false,
-    stripVersion: false,
-    preserveDefines: false,
-    preserveUniforms: true,
-    preserveVariables: false,
-    nomangle: false,
-  },
-  readFileCallback,
-  dirname
-);
+const glsl = new GlslMinify({
+  output: "sourceOnly",
+  esModule: false,
+  stripVersion: false,
+  preserveDefines: false,
+  preserveUniforms: true,
+  preserveVariables: false,
+  nomangle: [],
+});
 
 const VALID_EXTENSIONS = [".frag", ".vert", ".vs", ".fs"];
 
-const start = async ([inputFile]) => {
+const start: (files: string[]) => void = async ([inputFile]) => {
   if (inputFile === undefined) {
     console.error("No input filename provided.");
     process.exit(1);

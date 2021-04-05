@@ -9,7 +9,8 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "prebuild": "tsc --noEmit && bin/minifyShader.js src/shaders/fragmentShader.frag && bin/minifyShader.js src/shaders/vertexShader.vert",
+    "prebuild": "tsc --noEmit && yarn build-shaders",
+    "build-shaders": "bin/minifyShader.ts src/shaders/fragmentShader.frag && bin/minifyShader.ts src/shaders/vertexShader.vert",
     "build": "parcel build ./src/index.ts",
     "build-docs": "typedoc src/index.ts --includeVersion --name 'Geppetto Player'",
     "test": "jest",
@@ -52,6 +53,7 @@
     "prettier": "^2.2.1",
     "size-limit": "^4.10.1",
     "ts-jest": "^26.5.4",
+    "ts-node": "^9.1.1",
     "typedoc": "^0.20.34",
     "typescript": "^4.2.3",
     "webpack-glsl-minify": "^1.4.2"
