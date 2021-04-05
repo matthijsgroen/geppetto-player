@@ -1,5 +1,9 @@
 # Geppetto player
 
+![npm type definitions](https://img.shields.io/npm/types/geppetto-player)
+![License](https://img.shields.io/npm/l/geppetto-player)
+![Version](https://img.shields.io/npm/v/geppetto-player)
+
 [API documentation](https://matthijsgroen.github.io/geppetto-player)
 
 Library for playing Geppetto animations. For the Desktop application to create the animations, see [the Geppetto website](https://matthijsgroen.github.io/geppetto)
