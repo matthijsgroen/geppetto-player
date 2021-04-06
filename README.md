@@ -1,4 +1,4 @@
-# Geppetto player
+# Geppetto player 🌱
 
 ![npm type definitions](https://img.shields.io/npm/types/geppetto-player)
 ![License](https://img.shields.io/npm/l/geppetto-player)
@@ -7,6 +7,14 @@
 [API documentation](https://matthijsgroen.github.io/geppetto-player)
 
 Library for playing Geppetto animations. For the Desktop application to create the animations, see [the Geppetto website](https://matthijsgroen.github.io/geppetto)
+
+# Features
+
+- Setup of webGL Canvas for playing Geppetto files
+- Loading and rendering of Geppetto files
+- Listening to events from animation tracks
+- Using controls from images
+- Starting/stopping looping of animation tracks
 
 ## Minimal setup
 
@@ -46,8 +54,8 @@ const start = async () => {
 
   // Render each frame
   const renderFrame = () => {
-    player.render();
-    bgAnimationControl.render();
+    player.render(); // Clears the canvas
+    bgAnimationControl.render(); // Render active frame of the animation
     window.requestAnimationFrame(renderFrame);
   };
 
@@ -56,6 +64,11 @@ const start = async () => {
 
 start();
 ```
+
+# Why do I need to setup this render loop myself?
+
+It is to give you more control. You can specify the resolution to render,
+or render multiply Geppetto animations in the same WebGL Canvas. You could even create framebuffers, render into them and apply a shader aftereffect on it if you desire. (all these things I consider outside of the scope of this player library :-))
 
 # License
 

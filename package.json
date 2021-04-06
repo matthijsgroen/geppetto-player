@@ -2,6 +2,13 @@
   "name": "geppetto-player",
   "version": "1.0.0-beta.1",
   "description": "WebGL Player for Geppetto files",
+  "keywords": [
+    "canvas",
+    "webgl",
+    "2d",
+    "animation",
+    "interaction"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "git@github.com:matthijsgroen/geppetto-player.git",
@@ -12,6 +19,7 @@
     "prebuild": "tsc --noEmit && yarn build-shaders",
     "build-shaders": "bin/minifyShader.ts src/shaders/fragmentShader.frag && bin/minifyShader.ts src/shaders/vertexShader.vert",
     "build": "parcel build ./src/index.ts",
+    "postbuild": "yarn build-docs",
     "build-docs": "typedoc src/index.ts --includeVersion --name 'Geppetto Player'",
     "test": "jest",
     "lint": "eslint src/",
