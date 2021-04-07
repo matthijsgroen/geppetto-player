@@ -166,7 +166,8 @@ const convertAnimations = (
 
     return {
       name: a.name,
-      duration: a.keyframes[a.keyframes.length - 1].time,
+      duration:
+        a.keyframes.length === 0 ? 0 : a.keyframes[a.keyframes.length - 1].time,
       looping: a.looping,
       tracks,
       events,

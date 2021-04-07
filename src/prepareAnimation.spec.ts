@@ -118,6 +118,11 @@ describe("prepareAnimation", () => {
           },
         ],
       },
+      {
+        name: "New Animation",
+        looping: false,
+        keyframes: [],
+      },
     ],
   };
 
@@ -266,6 +271,13 @@ describe("prepareAnimation", () => {
             [1, new Float32Array([2000, 0.4, 6200, 1.0])],
           ],
           events: [[2500, "MyCustomEvent"]],
+        },
+        {
+          name: "New Animation",
+          duration: 0,
+          looping: false,
+          tracks: [],
+          events: [],
         },
       ]);
     });
