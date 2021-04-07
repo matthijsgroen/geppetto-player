@@ -434,6 +434,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
         }
 
         controlValues[controlIndex] = value;
+        renderControlValues[controlIndex] = value;
       };
 
       const newAnimation: AnimationControls = {
