@@ -554,8 +554,6 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             zIndex * 0.01
           );
 
-          renderControlValues.set(controlValues, 0);
-
           const now = +new Date();
           for (const playing of playingAnimations) {
             const playTime = now - playing.iterationStartedAt;
@@ -568,7 +566,12 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
                 stopTrack(playingAnimation.name);
                 continue;
               }
-              playing.iterationStartedAt = now - playPosition;
+              playing.iterationStartedAt = now; //- playPosition;
+
+              // Store current value as start value of next iteration
+              for (const [controlIndex] of playingAnimation.tracks) {
+                controlValues[controlIndex] = renderControlValues[controlIndex];
+              }
             }
 
             for (const [time, event] of playingAnimation.events) {
