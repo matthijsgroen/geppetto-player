@@ -13,7 +13,7 @@ export type PreparedFloatBuffer = {
 };
 
 export type PreparedIntBuffer = {
-  data: Int16Array;
+  data: Int32Array;
   length: number;
   stride: number;
 };
@@ -22,14 +22,6 @@ export const vectorArrayToPreparedFloatBuffer = (
   array: Vec2[] | Vec3[] | Vec4[]
 ): PreparedFloatBuffer => ({
   data: new Float32Array(flatten(array)),
-  length: array.length,
-  stride: array[0] === undefined ? 0 : array[0].length,
-});
-
-export const vectorArrayToPreparedIntBuffer = (
-  array: Vec2[] | Vec3[] | Vec4[]
-): PreparedIntBuffer => ({
-  data: new Int16Array(flatten(array)),
   length: array.length,
   stride: array[0] === undefined ? 0 : array[0].length,
 });

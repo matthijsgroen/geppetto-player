@@ -240,11 +240,10 @@ const setProgramBuffer = (gl: WebGLRenderingContext, program: WebGLProgram) => (
   const uniformLocation = gl.getUniformLocation(program, uniform);
   const stride = buffer.stride;
 
-  if (stride == 1) {
-    gl.uniform1fv(uniformLocation, buffer.data);
-  } else if (stride == 2) {
+  if (stride == 2) {
     gl.uniform2fv(uniformLocation, buffer.data);
   } else if (stride == 3) {
+    console.log(stride, uniform, buffer.data.length);
     gl.uniform3fv(uniformLocation, buffer.data);
   } else if (stride == 4) {
     gl.uniform4fv(uniformLocation, buffer.data);
@@ -317,9 +316,11 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
       const texture = setupTexture(gl, program, image);
 
       // 4. Set Uniforms
+      const parentLocation = gl.getUniformLocation(program, "uMutationParent");
+      gl.uniform1iv(parentLocation, animation.mutatorParents.data);
+
       const setBuffer = setProgramBuffer(gl, program);
       setBuffer("uMutationVectors", animation.mutators);
-      setBuffer("uMutationParent", animation.mutatorParents);
       setBuffer("uMutationValues", animation.mutationValues);
       setBuffer("uControlMutationValues", animation.controlMutationValues);
       setBuffer("uMutationValueIndices", animation.mutationValueIndices);
@@ -567,7 +568,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
                 stopTrack(playingAnimation.name);
                 continue;
               }
-              playing.iterationStartedAt = now; //- playPosition;
+              playing.iterationStartedAt = now - playPosition;
 
               // Store current value as start value of next iteration
               for (const [controlIndex] of playingAnimation.tracks) {

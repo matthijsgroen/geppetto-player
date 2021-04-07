@@ -10,7 +10,7 @@ uniform vec2 uMutationValues[MAX_MUT];
 
 // x = type, yz = origin, a = radius
 uniform vec4 uMutationVectors[MAX_MUT];
-uniform float uMutationParent[MAX_MUT];
+uniform int uMutationParent[MAX_MUT];
 
 attribute vec2 coordinates;
 attribute vec2 aTextureCoord;
@@ -113,7 +113,7 @@ vec3 mutatePoint(vec3 startValue, int mutationIndex) {
       return result;
     }
     result = mutateOnce(result, currentNode);
-    currentNode = int(uMutationParent[currentNode]);
+    currentNode = uMutationParent[currentNode];
   }
   return result;
 }

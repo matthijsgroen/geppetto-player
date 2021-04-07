@@ -4,7 +4,6 @@ import {
   PreparedFloatBuffer,
   PreparedIntBuffer,
   vectorArrayToPreparedFloatBuffer,
-  vectorArrayToPreparedIntBuffer,
 } from "./buffer";
 import { isMutationVector, isShapeDefinition, walkShapes } from "./traverse";
 import {
@@ -79,7 +78,7 @@ const getParentMutation = (
 export const createMutationList = (
   shapes: ShapeDefinition[]
 ): {
-  parentList: Int16Array;
+  parentList: Int32Array;
   vectorSettings: Vec4[];
   shapeMutatorMapping: Record<string, number>;
   mutatorMapping: Record<string, number>;
@@ -120,7 +119,7 @@ export const createMutationList = (
     return undefined;
   });
 
-  const parentList = new Int16Array(mutators.length);
+  const parentList = new Int32Array(mutators.length);
   mutatorIndices.forEach((item, index) => {
     parentList[index] = item.parent;
   });
@@ -203,8 +202,8 @@ export type PreparedImageDefinition = {
   mutatorParents: PreparedIntBuffer;
   mutationValues: PreparedFloatBuffer;
   controlMutationValues: PreparedFloatBuffer;
-  mutationValueIndices: PreparedIntBuffer;
-  controlMutationIndices: PreparedIntBuffer;
+  mutationValueIndices: PreparedFloatBuffer;
+  controlMutationIndices: PreparedFloatBuffer;
   shapeVertices: PreparedFloatBuffer;
   shapeIndices: Uint16Array;
   shapes: PreparedShape[];
@@ -377,10 +376,10 @@ export const prepareAnimation = (
     controlMutationValues: vectorArrayToPreparedFloatBuffer(
       controlMutationValueList
     ),
-    mutationValueIndices: vectorArrayToPreparedIntBuffer(
+    mutationValueIndices: vectorArrayToPreparedFloatBuffer(
       mutationValueIndicesList
     ),
-    controlMutationIndices: vectorArrayToPreparedIntBuffer(
+    controlMutationIndices: vectorArrayToPreparedFloatBuffer(
       controlMutationIndicesList
     ),
     defaultControlValues: controlValues,

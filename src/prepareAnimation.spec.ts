@@ -218,7 +218,7 @@ describe("prepareAnimation", () => {
         // 2. mutate 1, 1 - under control by one control (index 1 start)
         // 3. stretch 0, 0 - not under control
         // 4. limb 2, 2 - under control by two contorls (index 2 start)
-        new Int16Array([0, 0, 0, 1, 1, 1, 0, 0, 2, 2])
+        new Float32Array([0, 0, 0, 1, 1, 1, 0, 0, 2, 2])
       );
 
       expect(mutationValueIndices.stride).toEqual(3);
@@ -243,7 +243,7 @@ describe("prepareAnimation", () => {
         //   controlValue = 1 (2nd controller)
         //   controlType = 0 (default for now)
 
-        new Int16Array([4, 1, 0, 0, 0, 0, 2, 0, 0, 6, 1, 0])
+        new Float32Array([4, 1, 0, 0, 0, 0, 2, 0, 0, 6, 1, 0])
       );
 
       expect(maxIteration).toEqual(2);
