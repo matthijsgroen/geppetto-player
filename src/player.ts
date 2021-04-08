@@ -279,13 +279,18 @@ const setupTexture = (
  *
  * @param element the Canvas DOM element containing a WebGL Context
  */
-export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
-  const gl = element.getContext("webgl", {
-    premultipliedalpha: true,
-    depth: true,
-    antialias: true,
-    powerPreference: "low-power",
-  }) as WebGLRenderingContext;
+export const createPlayer = (
+  element: HTMLCanvasElement,
+  renderingContext?: WebGLRenderingContext
+): GeppettoPlayer => {
+  const gl =
+    renderingContext ||
+    (element.getContext("webgl", {
+      premultipliedalpha: true,
+      depth: true,
+      antialias: true,
+      powerPreference: "low-power",
+    }) as WebGLRenderingContext);
 
   const animations: AnimationControls[] = [];
   let onTrackStoppedListeners: TrackStoppedCallback[] = [];

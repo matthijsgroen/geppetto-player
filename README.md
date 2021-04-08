@@ -70,6 +70,10 @@ start();
 It is to give you more control. You can specify the resolution to render,
 or render multiply Geppetto animations in the same WebGL Canvas. You could even create framebuffers, render into them and apply a shader aftereffect on it if you desire. (all these things I consider outside of the scope of this player library :-))
 
+# Using the library in babel built site (Webpack e.g.)
+
+Check out: https://babeljs.io/docs/en/babel-plugin-proposal-optional-chaining
+
 # License
 
 [MIT](./LICENSE) (c) [Matthijs Groen](https://twitter.com/matthijsgroen)
