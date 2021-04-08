@@ -243,7 +243,6 @@ const setProgramBuffer = (gl: WebGLRenderingContext, program: WebGLProgram) => (
   if (stride == 2) {
     gl.uniform2fv(uniformLocation, buffer.data);
   } else if (stride == 3) {
-    console.log(stride, uniform, buffer.data.length);
     gl.uniform3fv(uniformLocation, buffer.data);
   } else if (stride == 4) {
     gl.uniform4fv(uniformLocation, buffer.data);
