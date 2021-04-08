@@ -31,36 +31,49 @@ export type AnimationControls = {
    * The default value is based on how the animation is build.
    *
    * @param loop true for looping, false to stop looping.
-   * @param track the name of the animation track to adjust.
+   * @param trackName the name of the animation track to adjust.
+   * @throws an error if the provided trackName does not exist
    */
-  setLooping(loop: boolean, track: string): void;
+  setLooping(loop: boolean, trackName: string): void;
 
   /**
    * Start an animation. Conflicting animations will be automatically stopped.
    *
-   * @param track the name of the animation track to start.
+   * @param trackName the name of the animation track to start.
    * If the name is not valid, an exception will be thrown
    * indicating what animation names are available.
+   * @throws an error if the provided trackName does not exist
    */
-  startTrack(track: string): void;
+  startTrack(trackName: string): void;
 
   /**
    * Stop an animation.
    *
-   * @param track the name of the animation track to start.
+   * @param trackName the name of the animation track to start.
    * If the name is not valid, an exception will be thrown
    * indicating what animation names are available.
    */
-  stopTrack(track: string): void;
+  stopTrack(trackName: string): void;
 
   /**
    * Manipulates a control. Will stop animations that are using this control as well.
    *
-   * @param control name of the control to change
+   * @param controlName name of the control to change
    * @param value value to set for control. Take into account that each control can have different
    * value limits, depending on the amount of step a control has.
+   * @throws an error if the provided controlName does not exist
    */
-  setControlValue(control: string, value: number): void;
+  setControlValue(controlName: string, value: number): void;
+
+  /**
+   * Retreives current value of a control. This value will not update for each frame
+   * of an animation. It will only update at the end of each play iteration of an animation.
+   *
+   * @param controlName name of the control to get value from
+   * @return value of the control. Take into account that each control can have different
+   * value limits, depending on the amount of step a control has.
+   */
+  getControlValue(controlName: string): number;
 
   /**
    * Update the panning of the animation.
@@ -167,6 +180,20 @@ export type GeppettoPlayer = {
   destroy: () => void;
 };
 
+const getContext = (element: HTMLCanvasElement): WebGLRenderingContext => {
+  const gl = element.getContext("webgl", {
+    premultipliedalpha: true,
+    depth: true,
+    antialias: true,
+    powerPreference: "low-power",
+  }) as WebGLRenderingContext;
+
+  if (!gl) {
+    throw new Error("Canvas has no webgl context available");
+  }
+  return gl;
+};
+
 /**
  * Initializes the WebGL Context of a provided context. Configures the context and returns
  * a GeppettoPlayer bound to this element.
@@ -177,16 +204,7 @@ export type GeppettoPlayer = {
  * @param element the Canvas DOM element that is not yet initialized with a context
  */
 export const setupWebGL = (element: HTMLCanvasElement): GeppettoPlayer => {
-  const gl = element.getContext("webgl", {
-    premultipliedalpha: true,
-    depth: true,
-    antialias: true,
-    powerPreference: "low-power",
-  }) as WebGLRenderingContext;
-
-  if (!gl) {
-    throw new Error("No WebGL Support");
-  }
+  const gl = getContext(element);
 
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
@@ -279,18 +297,8 @@ const setupTexture = (
  *
  * @param element the Canvas DOM element containing a WebGL Context
  */
-export const createPlayer = (
-  element: HTMLCanvasElement,
-  renderingContext?: WebGLRenderingContext
-): GeppettoPlayer => {
-  const gl =
-    renderingContext ||
-    (element.getContext("webgl", {
-      premultipliedalpha: true,
-      depth: true,
-      antialias: true,
-      powerPreference: "low-power",
-    }) as WebGLRenderingContext);
+export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
+  const gl = getContext(element);
 
   const animations: AnimationControls[] = [];
   let onTrackStoppedListeners: TrackStoppedCallback[] = [];
@@ -409,17 +417,33 @@ export const createPlayer = (
           controlValues[controlIndex] = value;
         }
       };
+
+      const nameToControlIndex = (controlName: string): number => {
+        const controlIndex = controlNames.indexOf(controlName);
+        if (controlIndex === -1) {
+          throw new Error(
+            `Control ${controlName} does not exist in ${controlNames.join(",")}`
+          );
+        }
+        return controlIndex;
+      };
+
+      const nameToTrackIndex = (trackName: string): number => {
+        const trackIndex = trackNames.indexOf(trackName);
+        if (trackIndex === -1) {
+          throw new Error(
+            `Track ${trackName} does not exist in ${trackNames.join(",")}`
+          );
+        }
+        return trackIndex;
+      };
+
       const setControlValue: AnimationControls["setControlValue"] = (
         control,
         value
       ) => {
-        const controlIndex = controlNames.indexOf(control);
+        const controlIndex = nameToControlIndex(control);
 
-        if (controlIndex === -1) {
-          throw new Error(
-            `Control ${control} does not exist in ${controlNames.join(",")}`
-          );
-        }
         const maxValue = animation.controls[controlIndex].steps - 1;
         if (value < 0 || value > maxValue) {
           throw new Error(
@@ -453,21 +477,11 @@ export const createPlayer = (
           animations.splice(animations.indexOf(newAnimation), 1);
         },
         setLooping(loop, track) {
-          const trackIndex = trackNames.indexOf(track);
-          if (trackIndex === -1) {
-            throw new Error(
-              `Track ${track} does not exist in ${trackNames.join(",")}`
-            );
-          }
+          const trackIndex = nameToTrackIndex(track);
           looping[trackIndex] = loop;
         },
         startTrack(track) {
-          const trackIndex = trackNames.indexOf(track);
-          if (trackIndex === -1) {
-            throw new Error(
-              `Track ${track} does not exist in ${trackNames.join(",")}`
-            );
-          }
+          const trackIndex = nameToTrackIndex(track);
           const animationControls = animation.animations[trackIndex].tracks.map(
             ([controlNr]) => controlNr
           );
@@ -496,6 +510,8 @@ export const createPlayer = (
         },
         stopTrack,
         setControlValue,
+        getControlValue: (controlName) =>
+          controlValues[nameToControlIndex(controlName)],
         setPanning(newPanX, newPanY) {
           panX = newPanX;
           panY = newPanY;

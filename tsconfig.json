@@ -9,7 +9,7 @@
     "sourceMap": true,           
     "outDir": "./dist-ts/",
     "rootDir": "./src/",
-    "removeComments": true,
+    "removeComments": false,
 
     // /* Strict Type-Checking Options */
     "strict": true,
