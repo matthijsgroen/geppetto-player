@@ -403,10 +403,6 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
         }
         playingAnimations.splice(playingIndex, 1);
 
-        for (const listener of onTrackStoppedListeners) {
-          listener(track);
-        }
-
         // place current active control values in control values list
         for (const [controlIndex, track] of playingAnimation.tracks) {
           const value = interpolateFloat(
@@ -415,6 +411,10 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             controlValues[controlIndex]
           );
           controlValues[controlIndex] = value;
+        }
+
+        for (const listener of onTrackStoppedListeners) {
+          listener(track);
         }
       };
 
