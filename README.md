@@ -1,8 +1,8 @@
 # Geppetto player 🌱
 
-![npm type definitions](https://img.shields.io/npm/types/geppetto-player)
-![License](https://img.shields.io/npm/l/geppetto-player)
-![Version](https://img.shields.io/npm/v/geppetto-player)
+[![npm type definitions](https://img.shields.io/npm/types/geppetto-player)](https://matthijsgroen.github.io/geppetto-player)
+[![License](https://img.shields.io/npm/l/geppetto-player)](https://github.com/matthijsgroen/geppetto-player/blob/main/LICENSE)
+[![Version](https://img.shields.io/npm/v/geppetto-player)](https://www.npmjs.com/package/geppetto-player)
 
 [API documentation](https://matthijsgroen.github.io/geppetto-player)
 
@@ -15,6 +15,12 @@ Library for playing Geppetto animations. For the Desktop application to create t
 - Listening to events from animation tracks
 - Using controls from images
 - Starting/stopping looping of animation tracks
+
+# Install
+
+```
+yarn add geppetto-player
+```
 
 ## Minimal setup
 
