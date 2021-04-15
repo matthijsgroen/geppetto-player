@@ -13,7 +13,7 @@
   "types": "dist/index.d.ts",
   "repository": "git@github.com:matthijsgroen/geppetto-player.git",
   "author": "Matthijs Groen <matthijs.groen@gmail.com> (https://github.com/matthijsgroen)",
-  "homepage": "https://matthijsgroen.github.io/geppetto/",
+  "homepage": "https://geppetto.js.org",
   "license": "MIT",
   "private": false,
   "scripts": {

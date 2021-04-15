@@ -6,7 +6,7 @@
 
 [API documentation](https://matthijsgroen.github.io/geppetto-player)
 
-Library for playing Geppetto animations. For the Desktop application to create the animations, see [the Geppetto website](https://matthijsgroen.github.io/geppetto)
+Library for playing Geppetto animations. For the Desktop application to create the animations, see [the Geppetto website](https://geppetto.js.org)
 
 # Features
 
