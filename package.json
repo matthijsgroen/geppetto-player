@@ -1,6 +1,6 @@
 {
   "name": "geppetto-player",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.0-rc.1",
   "description": "WebGL Player for Geppetto files",
   "keywords": [
     "canvas",
