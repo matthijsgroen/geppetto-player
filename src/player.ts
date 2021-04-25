@@ -16,6 +16,18 @@ type CustomEventCallback = (
   time: number
 ) => void;
 
+export type PlayOptions = {
+  /**
+   * Start animation at given ms.
+   */
+  startAt?: number;
+  /**
+   * Playback speed.
+   * @default 1.0
+   */
+  speed?: number;
+};
+
 /**
  * Options to control the animation, start animation tracks, etc.
  */
@@ -44,7 +56,7 @@ export type AnimationControls = {
    * indicating what animation names are available.
    * @throws an error if the provided trackName does not exist
    */
-  startTrack(trackName: string): void;
+  startTrack(trackName: string, options?: PlayOptions): void;
 
   /**
    * Stop an animation.
@@ -142,6 +154,7 @@ type PlayStatus = {
   name: string;
   index: number;
   startAt: number;
+  speed: number;
   startedAt: number;
   iterationStartedAt: number;
   lastRender: number;
@@ -480,7 +493,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
           const trackIndex = nameToTrackIndex(track);
           looping[trackIndex] = loop;
         },
-        startTrack(track) {
+        startTrack(track, { startAt = 0, speed = 1 } = {}) {
           const trackIndex = nameToTrackIndex(track);
           const animationControls = animation.animations[trackIndex].tracks.map(
             ([controlNr]) => controlNr
@@ -498,13 +511,13 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             }
           }
 
-          const startAt = 0;
           playingAnimations.push({
             name: track,
             index: trackIndex,
             startAt,
+            speed,
             startedAt: +new Date(),
-            iterationStartedAt: +new Date() - startAt,
+            iterationStartedAt: +new Date() - startAt / speed,
             lastRender: 0,
           });
         },
@@ -578,7 +591,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
 
           const now = +new Date();
           for (const playing of playingAnimations) {
-            const playTime = now - playing.iterationStartedAt;
+            const playTime = (now - playing.iterationStartedAt) * playing.speed;
             const playingAnimation = animation.animations[playing.index];
 
             const playPosition = playTime % playingAnimation.duration;
