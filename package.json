@@ -1,6 +1,6 @@
 {
   "name": "geppetto-player",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "WebGL Player for Geppetto files",
   "keywords": [
     "canvas",
@@ -72,5 +72,9 @@
   ],
   "dependencies": {
     "delaunator": "^4.0.1"
-  }
+  },
+  "browserslist": [
+    "chrome 87",
+    "firefox 78"
+  ]
 }
