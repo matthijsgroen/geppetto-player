@@ -102,7 +102,6 @@ export const createMutationList = (
       mutatorIndices.push({ name: item.name, index, parent: mutatorIndex });
       mutatorMapping[item.name] = mutatorIndex;
     }
-    return undefined;
   });
 
   const shapeMutatorMapping: Record<string, number> = {};
@@ -116,7 +115,6 @@ export const createMutationList = (
 
       shapeMutatorMapping[item.name] = mutatorIndex;
     }
-    return undefined;
   });
 
   const parentList = new Int32Array(mutators.length);
@@ -197,7 +195,16 @@ export type PreparedAnimation = {
   events: [number, string][];
 };
 
+type DirectControl = {
+  mutation: number;
+  control: number;
+  stepType: number;
+  trackX: Float32Array;
+  trackY: Float32Array;
+};
+
 export type PreparedImageDefinition = {
+  directControls: DirectControl[];
   mutators: PreparedFloatBuffer;
   mutatorParents: PreparedIntBuffer;
   mutationValues: PreparedFloatBuffer;
@@ -279,9 +286,7 @@ export const prepareAnimation = (
   };
 
   type MutationControl = {
-    [key: number]: {
-      controls: ControlData[];
-    };
+    [key: number]: ControlData[];
   };
 
   const controlMutationValueList: Vec2[] = [];
@@ -318,19 +323,14 @@ export const prepareAnimation = (
         const controlData: ControlData = {
           name: control.name,
           controlIndex,
-          valueStartIndex: controlMutationValueList.length,
+          valueStartIndex: 0,
           values,
           stepType: 0,
         };
-        controlMutationValueList.push(...values);
 
         result = {
           ...result,
-          [index]: {
-            controls: ((result[index] || {}).controls || []).concat(
-              controlData
-            ),
-          },
+          [index]: (result[index] || []).concat(controlData),
         };
       });
       return result;
@@ -338,22 +338,50 @@ export const prepareAnimation = (
     {}
   );
 
-  const amountIndices = Math.max(
-    ...Object.keys(mutationControlData).map((key) => parseInt(key, 10))
-  );
-  controlMutationIndicesList.length = amountIndices;
+  controlMutationIndicesList.length = mutatorInfo.vectorSettings.length;
   controlMutationIndicesList.fill([0, 0]);
 
   let maxIteration = 0;
+  const directControls: DirectControl[] = [];
 
-  Object.entries(mutationControlData).forEach(([key, value]) => {
-    const items: Vec3[] = value.controls.map<Vec3>((d) => [
+  Object.entries(mutationControlData).forEach(([keyAsString, controls]) => {
+    const key = parseInt(keyAsString, 10);
+    if (controls.length === 1) {
+      const control = controls[0];
+      directControls.push({
+        mutation: key,
+        control: control.controlIndex,
+        stepType: control.stepType,
+        trackX: new Float32Array(
+          control.values.reduce<number[]>(
+            (result, element, index) => result.concat(index, element[0]),
+            []
+          )
+        ),
+        trackY: new Float32Array(
+          control.values.reduce<number[]>(
+            (result, element, index) => result.concat(index, element[1]),
+            []
+          )
+        ),
+      });
+      return;
+    }
+    if (controls.length === 0) {
+      return;
+    }
+    for (const control of controls) {
+      control.valueStartIndex = controlMutationValueList.length;
+      controlMutationValueList.push(...control.values);
+    }
+
+    const items: Vec3[] = controls.map<Vec3>((d) => [
       d.valueStartIndex,
       d.controlIndex,
       d.stepType,
     ]);
 
-    controlMutationIndicesList[parseInt(key, 10)] = [
+    controlMutationIndicesList[key] = [
       mutationValueIndicesList.length,
       items.length,
     ];
@@ -362,6 +390,7 @@ export const prepareAnimation = (
   });
 
   return {
+    directControls,
     mutators: vectorArrayToPreparedFloatBuffer(mutatorInfo.vectorSettings),
     mutatorParents: {
       data: mutatorInfo.parentList,
