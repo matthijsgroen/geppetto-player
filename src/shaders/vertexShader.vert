@@ -1,4 +1,4 @@
-@nomangle MAX_MUT MAX_IT uControlMutationValues uMutationValueIndices uControlMutationIndices uControlValues
+@nomangle MAX_MUT MAX_IT uControlMutValues uMutValueIndices uControlMutIndices uControlValues
 #define PI_FRAC 0.017453292519943295
 
 uniform vec2 viewport;
@@ -6,11 +6,11 @@ uniform vec3 basePosition;
 uniform vec3 translate;
 uniform float mutation;
 uniform vec4 scale;
-uniform vec2 uMutationValues[MAX_MUT];
+uniform vec2 uMutValues[MAX_MUT];
 
 // x = type, yz = origin, a = radius
-uniform vec4 uMutationVectors[MAX_MUT];
-uniform int uMutationParent[MAX_MUT];
+uniform vec4 uMutVectors[MAX_MUT];
+uniform int uMutParent[MAX_MUT];
 
 attribute vec2 coordinates;
 attribute vec2 aTextureCoord;
@@ -26,8 +26,8 @@ mat4 viewportScale = mat4(
 );
 
 vec2 getMutationValue(int mutationIndex, int mutationType) {
-  vec2 result = uMutationValues[mutationIndex];
-  vec2 controlMutations = uControlMutationIndices[mutationIndex];
+  vec2 result = uMutValues[mutationIndex];
+  vec2 controlMutations = uControlMutIndices[mutationIndex];
   int start = int(controlMutations.x);
   int steps = int(controlMutations.y);
   if (steps == 0) {
@@ -35,7 +35,7 @@ vec2 getMutationValue(int mutationIndex, int mutationType) {
   }
   for(int i = 0; i < MAX_IT; i++) {
     if (i < steps) {
-      vec3 valueIndices = uMutationValueIndices[start + i];
+      vec3 valueIndices = uMutValueIndices[start + i];
       // x = offset
       // y = control value index
       // z = stepType
@@ -45,8 +45,8 @@ vec2 getMutationValue(int mutationIndex, int mutationType) {
       int endIndex = int(ceil(valueIndices.x + controlValue));
       float mixFactor = controlValue - floor(controlValue);
 
-      vec2 mutAValue = uControlMutationValues[startIndex];
-      vec2 mutBValue = uControlMutationValues[endIndex];
+      vec2 mutAValue = uControlMutValues[startIndex];
+      vec2 mutBValue = uControlMutValues[endIndex];
       vec2 mutValue = mix(mutAValue, mutBValue, mixFactor);
 
       if (mutationType == 2 || mutationType == 5) { // Stretch & Opacity
@@ -63,7 +63,7 @@ vec2 getMutationValue(int mutationIndex, int mutationType) {
 }
 
 vec3 mutateOnce(vec3 startValue, int mutationIndex) {
-  vec4 mutation = uMutationVectors[mutationIndex];
+  vec4 mutation = uMutVectors[mutationIndex];
   int mutationType = int(mutation.x);
 
   vec2 mutationValue = getMutationValue(mutationIndex, mutationType);
@@ -113,7 +113,7 @@ vec3 mutatePoint(vec3 startValue, int mutationIndex) {
       return result;
     }
     result = mutateOnce(result, currentNode);
-    currentNode = uMutationParent[currentNode];
+    currentNode = uMutParent[currentNode];
   }
   return result;
 }

@@ -199,6 +199,7 @@ type DirectControl = {
   mutation: number;
   control: number;
   stepType: number;
+  mixMultiply: boolean;
   trackX: Float32Array;
   trackY: Float32Array;
 };
@@ -348,8 +349,13 @@ export const prepareAnimation = (
     const key = parseInt(keyAsString, 10);
     if (controls.length === 1) {
       const control = controls[0];
+      const mutType = mutatorInfo.vectorSettings[key][0];
+
       directControls.push({
         mutation: key,
+        mixMultiply:
+          mutType === vectorTypeMapping.stretch ||
+          mutType === vectorTypeMapping.opacity,
         control: control.controlIndex,
         stepType: control.stepType,
         trackX: new Float32Array(

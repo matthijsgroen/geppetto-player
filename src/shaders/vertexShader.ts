@@ -6,9 +6,9 @@ export const animationVertexShader = (
 ): string => `
   #define MAX_MUT ${animation.mutators.length}
   #define MAX_IT ${animation.maxIteration}
-  uniform vec2 uControlMutationValues[${animation.controlMutationValues.length}];
-  uniform vec3 uMutationValueIndices[${animation.mutationValueIndices.length}];
-  uniform vec2 uControlMutationIndices[${animation.controlMutationIndices.length}];
+  uniform vec2 uControlMutValues[${animation.controlMutationValues.length}];
+  uniform vec3 uMutValueIndices[${animation.mutationValueIndices.length}];
+  uniform vec2 uControlMutIndices[${animation.controlMutationIndices.length}];
   uniform float uControlValues[${animation.controls.length}];
   ${shader}
 `;

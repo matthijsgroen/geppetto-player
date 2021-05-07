@@ -278,6 +278,7 @@ const setProgramBuffer = (gl: WebGLRenderingContext, program: WebGLProgram) => (
   } else if (stride == 4) {
     gl.uniform4fv(uniformLocation, buffer.data);
   }
+  return uniformLocation;
 };
 
 const setupTexture = (
@@ -341,15 +342,18 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
       const texture = setupTexture(gl, program, image);
 
       // 4. Set Uniforms
-      const parentLocation = gl.getUniformLocation(program, "uMutationParent");
+      const parentLocation = gl.getUniformLocation(program, "uMutParent");
       gl.uniform1iv(parentLocation, animation.mutatorParents.data);
 
       const setBuffer = setProgramBuffer(gl, program);
-      setBuffer("uMutationVectors", animation.mutators);
-      setBuffer("uMutationValues", animation.mutationValues);
-      setBuffer("uControlMutationValues", animation.controlMutationValues);
-      setBuffer("uMutationValueIndices", animation.mutationValueIndices);
-      setBuffer("uControlMutationIndices", animation.controlMutationIndices);
+      const mutationValuesLocation = setBuffer(
+        "uMutValues",
+        animation.mutationValues
+      );
+      setBuffer("uMutVectors", animation.mutators);
+      setBuffer("uControlMutValues", animation.controlMutationValues);
+      setBuffer("uMutValueIndices", animation.mutationValueIndices);
+      setBuffer("uControlMutIndices", animation.controlMutationIndices);
 
       const uControlValues = gl.getUniformLocation(program, "uControlValues");
       gl.uniform1fv(uControlValues, animation.defaultControlValues);
@@ -628,6 +632,22 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
               renderControlValues[controlIndex] = value;
             }
           }
+          const updatedMutationValues = Float32Array.from(
+            animation.mutationValues.data
+          );
+          for (const data of animation.directControls) {
+            const ctrlValue = renderControlValues[data.control];
+            const xValue = interpolateFloat(data.trackX, ctrlValue);
+            const yValue = interpolateFloat(data.trackY, ctrlValue);
+            if (data.mixMultiply) {
+              updatedMutationValues[data.mutation * 2] *= xValue;
+              updatedMutationValues[data.mutation * 2 + 1] *= yValue;
+            } else {
+              updatedMutationValues[data.mutation * 2] += xValue;
+              updatedMutationValues[data.mutation * 2 + 1] += yValue;
+            }
+          }
+          gl.uniform2fv(mutationValuesLocation, updatedMutationValues);
 
           gl.uniform1fv(uControlValues, renderControlValues);
 
