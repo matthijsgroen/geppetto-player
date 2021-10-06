@@ -5,7 +5,7 @@ import {
   PreparedIntBuffer,
   vectorArrayToPreparedFloatBuffer,
 } from "./buffer";
-import { isMutationVector, isShapeDefinition, walkShapes } from "./traverse";
+import { isMutationVector, isShapeDefinition, visitShapes } from "./traverse";
 import {
   ImageDefinition,
   MutationVector,
@@ -34,12 +34,15 @@ const getAnchor = (sprite: SpriteDefinition): Vec2 => {
 export const fileredTriangles = (points: number[][]): number[] =>
   Delaunator.from(points).triangles;
 
-const vectorTypeMapping = {
+const vectorTypeMapping: { [key in MutationVector["type"]]: number } = {
   translate: 1,
   stretch: 2,
   rotate: 3,
   deform: 4,
   opacity: 5,
+  lightness: 6,
+  colorize: 7,
+  saturation: 8,
 };
 
 const mutatorToVec4 = (mutator: MutationVector): Vec4 => [
@@ -88,7 +91,7 @@ export const createMutationList = (
 
   const mutatorMapping: Record<string, number> = {};
 
-  walkShapes(shapes, (item, parents) => {
+  visitShapes(shapes, (item, parents) => {
     if (isMutationVector(item)) {
       const value = mutatorToVec4(item);
       const index = mutators.length;
@@ -105,7 +108,7 @@ export const createMutationList = (
   });
 
   const shapeMutatorMapping: Record<string, number> = {};
-  walkShapes(shapes, (item, parents) => {
+  visitShapes(shapes, (item, parents) => {
     if (isShapeDefinition(item)) {
       const parentMutation = getParentMutation(parents.concat(item));
       const mutatorIndex =
@@ -238,7 +241,7 @@ export const prepareAnimation = (
   const vertices: Vec4[] = [];
   const indices: number[] = [];
 
-  walkShapes(imageDefinition.shapes, (shape) => {
+  visitShapes(imageDefinition.shapes, (shape) => {
     if (shape.type !== "sprite") return;
 
     const anchor = getAnchor(shape);
@@ -355,6 +358,8 @@ export const prepareAnimation = (
         mutation: key,
         mixMultiply:
           mutType === vectorTypeMapping.stretch ||
+          mutType === vectorTypeMapping.lightness ||
+          mutType === vectorTypeMapping.saturation ||
           mutType === vectorTypeMapping.opacity,
         control: control.controlIndex,
         stepType: control.stepType,
