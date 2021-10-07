@@ -346,18 +346,18 @@ describe("prepareAnimation", () => {
   });
 
   describe("version checking", () => {
-    it("supports version 1.0", () => {
-      const file = { ...imageDefinition, version: "1.0" };
+    it.each(["1.0", "1.1"])("Supports version (%s)", (version) => {
+      const file = { ...imageDefinition, version: version };
       expect(() => {
         prepareAnimation(file);
-      }).not.toThrowError("Only version 1.0 files are supported");
+      }).not.toThrowError();
     });
 
-    it.each(["1.1", "2.0"])("Rejects other versions (%s)", (version) => {
+    it.each(["1.2", "2.0"])("Rejects other versions (%s)", (version) => {
       const file = { ...imageDefinition, version };
       expect(() => {
         prepareAnimation(file);
-      }).toThrowError("Only version 1.0 files are supported");
+      }).toThrowError(`Version ${version} files are not supported`);
     });
   });
 });

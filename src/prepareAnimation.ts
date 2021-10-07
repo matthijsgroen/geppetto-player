@@ -224,6 +224,8 @@ export type PreparedImageDefinition = {
   animations: PreparedAnimation[];
 };
 
+const SUPPORTED_VERSIONS = ["1.0", "1.1"];
+
 /**
  * Convert the JSON based input animation file into a preprocessed list of buffers to place into WebGL
  *
@@ -233,8 +235,10 @@ export type PreparedImageDefinition = {
 export const prepareAnimation = (
   imageDefinition: ImageDefinition
 ): PreparedImageDefinition => {
-  if (imageDefinition.version !== "1.0") {
-    throw new Error("Only version 1.0 files are supported");
+  if (!SUPPORTED_VERSIONS.includes(imageDefinition.version)) {
+    throw new Error(
+      `Version ${imageDefinition.version} files are not supported`
+    );
   }
 
   const elements: PreparedShape[] = [];
