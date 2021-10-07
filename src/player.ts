@@ -1,5 +1,5 @@
 import { PreparedFloatBuffer, PreparedIntBuffer } from "./buffer";
-import { PreparedImageDefinition } from "./prepareAnimation";
+import { MixMode, PreparedImageDefinition } from "./prepareAnimation";
 import animationFragmentShader from "./shaders/fragmentShader-min.frag";
 import { animationVertexShader } from "./shaders/vertexShader";
 import { interpolateFloat } from "./vertices";
@@ -639,12 +639,15 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             const ctrlValue = renderControlValues[data.control];
             const xValue = interpolateFloat(data.trackX, ctrlValue);
             const yValue = interpolateFloat(data.trackY, ctrlValue);
-            if (data.mixMultiply) {
+            if (data.mixMode === MixMode.MULTIPLY) {
               updatedMutationValues[data.mutation * 2] *= xValue;
               updatedMutationValues[data.mutation * 2 + 1] *= yValue;
-            } else {
+            } else if (data.mixMode === MixMode.ADD) {
               updatedMutationValues[data.mutation * 2] += xValue;
               updatedMutationValues[data.mutation * 2 + 1] += yValue;
+            } else {
+              updatedMutationValues[data.mutation * 2] = xValue;
+              updatedMutationValues[data.mutation * 2 + 1] = yValue;
             }
           }
           gl.uniform2fv(mutationValuesLocation, updatedMutationValues);

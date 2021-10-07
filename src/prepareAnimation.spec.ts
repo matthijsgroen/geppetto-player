@@ -1,4 +1,4 @@
-import { prepareAnimation } from "./prepareAnimation";
+import { MixMode, prepareAnimation } from "./prepareAnimation";
 import { ImageDefinition } from "./types";
 
 describe("prepareAnimation", () => {
@@ -285,7 +285,7 @@ describe("prepareAnimation", () => {
           control: 1, // Control2
           mutation: 1, // hide
           stepType: 0, // (default for now)
-          mixMultiply: true,
+          mixMode: MixMode.MULTIPLY,
           trackX: new Float32Array([0, 1, 1, 0.2]),
           trackY: new Float32Array([0, 0, 1, 0]),
         });
@@ -294,7 +294,7 @@ describe("prepareAnimation", () => {
           control: 0, // Control1
           mutation: 2, // mutate
           stepType: 0, // (default for now)
-          mixMultiply: false,
+          mixMode: MixMode.ADD,
           trackX: new Float32Array([0, 15, 1, -15]),
           trackY: new Float32Array([0, 0, 1, 0]),
         });
@@ -303,7 +303,7 @@ describe("prepareAnimation", () => {
           control: 2, // Control3
           mutation: 5, // move
           stepType: 0, // (default for now)
-          mixMultiply: false,
+          mixMode: MixMode.ADD,
           trackX: new Float32Array([0, -500, 1, 300]),
           trackY: new Float32Array([0, 0, 1, 0]),
         });

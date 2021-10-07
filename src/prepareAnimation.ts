@@ -198,11 +198,17 @@ export type PreparedAnimation = {
   events: [number, string][];
 };
 
+export enum MixMode {
+  MULTIPLY,
+  ADD,
+  HUE,
+}
+
 type DirectControl = {
   mutation: number;
   control: number;
   stepType: number;
-  mixMultiply: boolean;
+  mixMode: MixMode;
   trackX: Float32Array;
   trackY: Float32Array;
 };
@@ -223,6 +229,16 @@ export type PreparedImageDefinition = {
   defaultControlValues: Float32Array;
   animations: PreparedAnimation[];
 };
+
+const getMixMode = (mutType: number): MixMode =>
+  mutType === vectorTypeMapping.stretch ||
+  mutType === vectorTypeMapping.lightness ||
+  mutType === vectorTypeMapping.saturation ||
+  mutType === vectorTypeMapping.opacity
+    ? MixMode.MULTIPLY
+    : mutType === vectorTypeMapping.colorize
+    ? MixMode.HUE
+    : MixMode.ADD;
 
 const SUPPORTED_VERSIONS = ["1.0", "1.1"];
 
@@ -360,11 +376,7 @@ export const prepareAnimation = (
 
       directControls.push({
         mutation: key,
-        mixMultiply:
-          mutType === vectorTypeMapping.stretch ||
-          mutType === vectorTypeMapping.lightness ||
-          mutType === vectorTypeMapping.saturation ||
-          mutType === vectorTypeMapping.opacity,
+        mixMode: getMixMode(mutType),
         control: control.controlIndex,
         stepType: control.stepType,
         trackX: new Float32Array(
