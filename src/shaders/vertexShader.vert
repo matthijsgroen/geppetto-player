@@ -29,6 +29,22 @@ mat4 viewportScale = mat4(
   -1, +1, 0, 1
 );
 
+float mixHue(float a, float b, float factor) {
+  float d = abs(a - b);
+
+  float aCorrect = a;
+  float bCorrect = b;
+
+  if (a < b && abs(a + 1.0 - b) < d) {
+    aCorrect = a + 1.0;
+  }
+  if (a > b && abs(b - a + 1.0) < d) {
+    bCorrect = b + 1.0;
+  }
+
+  return mod(mix(aCorrect, bCorrect, factor), 1.0);
+}
+
 vec2 getMutationValue(int mutationIndex, int mutationType) {
   vec2 result = uMutValues[mutationIndex];
   vec2 controlMutations = uControlMutIndices[mutationIndex];
@@ -51,15 +67,22 @@ vec2 getMutationValue(int mutationIndex, int mutationType) {
 
       vec2 mutAValue = uControlMutValues[startIndex];
       vec2 mutBValue = uControlMutValues[endIndex];
-      // TODO: Make special case for mixing hue values
       vec2 mutValue = mix(mutAValue, mutBValue, mixFactor);
 
       // Stretch & Opacity & Lightness & Saturation needs multiplication
       if (mutationType == 2 || mutationType == 5 || mutationType == 6 || mutationType == 8) { 
         result *= mutValue;
+      } else 
+      // Mixing hue values will be treated differently
+      if (mutationType == 7) {
+        result = vec2(
+          mixHue(mutAValue[0], mutBValue[0], mixFactor),
+          mutValue[1]
+        );
       } else {
         result += mutValue;
       }
+
     } else {
       return result;
     }
@@ -106,13 +129,11 @@ mat3 mutateOnce(mat3 startValue, int mutationIndex) {
   }
 
   if (mutationType == 5) { // Opacity
-    float opacity = mutationValue.x;
-    result = vec3(result.xy, result.z * opacity);
+    result = vec3(result.xy, result.z * mutationValue.x);
   }
 
   if (mutationType == 6) { // Lightness
-    float lightness = mutationValue.x;
-    color = vec3(lightness * color.x, color.yz);
+    color = vec3(mutationValue.x * color.x, color.yz);
   }
 
   if (mutationType == 7) { // Colorize setting
@@ -120,8 +141,7 @@ mat3 mutateOnce(mat3 startValue, int mutationIndex) {
   }
 
   if (mutationType == 8) { // Saturation
-    float saturation = mutationValue.x;
-    color = vec3(color.x, saturation * color.y, color.z);
+    color = vec3(color.x, mutationValue.x * color.y, color.z);
   }
 
   return mat3(

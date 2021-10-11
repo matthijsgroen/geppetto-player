@@ -2,7 +2,7 @@ import { PreparedFloatBuffer, PreparedIntBuffer } from "./buffer";
 import { MixMode, PreparedImageDefinition } from "./prepareAnimation";
 import animationFragmentShader from "./shaders/fragmentShader-min.frag";
 import { animationVertexShader } from "./shaders/vertexShader";
-import { interpolateFloat } from "./vertices";
+import { interpolateFloat, mixHue } from "./vertices";
 
 /**
  * Function to call for unsubscribing to an event listener
@@ -646,8 +646,9 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
               updatedMutationValues[data.mutation * 2] += xValue;
               updatedMutationValues[data.mutation * 2 + 1] += yValue;
             } else {
-              updatedMutationValues[data.mutation * 2] = xValue;
-              updatedMutationValues[data.mutation * 2 + 1] = yValue;
+              const hue = interpolateFloat(data.trackX, ctrlValue, 0, mixHue);
+              updatedMutationValues[data.mutation * 2] = hue;
+              updatedMutationValues[data.mutation * 2 + 1] *= yValue;
             }
           }
           gl.uniform2fv(mutationValuesLocation, updatedMutationValues);

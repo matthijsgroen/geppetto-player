@@ -64,7 +64,7 @@ void main(void) {
   float luminance = RGBToL(color);
   color = mix(
     color,
-    HSLToRGB(vec3(vTargetHue, 1.0, luminance * vTargetSaturation * 0.5)),
+    HSLToRGB(vec3(vTargetHue, vTargetSaturation, luminance)),
     1.0 - vSaturation
   ) * vBrightness;
 
