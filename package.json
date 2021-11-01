@@ -21,7 +21,7 @@
     "build-shaders": "bin/minifyShader.ts src/shaders/fragmentShader.frag && bin/minifyShader.ts src/shaders/vertexShader.vert",
     "build": "parcel build ./src/index.ts",
     "postbuild": "yarn build-docs",
-    "build-docs": "typedoc src/index.ts --includeVersion --name 'Geppetto Player'",
+    "build-docs": "typedoc src/index.ts --includeVersion --name 'Geppetto Player' --json typedocs.json",
     "test": "jest",
     "lint": "eslint src/",
     "presize": "yarn build",
