@@ -42,7 +42,8 @@
   "size-limit": [
     {
       "path": "dist/index.js",
-      "limit": "8KB"
+      "webpack": false,
+      "limit": "10KB"
     }
   ],
   "jest": {
