@@ -5,7 +5,7 @@ import {
   PreparedIntBuffer,
   vectorArrayToPreparedFloatBuffer,
 } from "./buffer";
-import { isMutationVector, isShapeDefinition, walkShapes } from "./traverse";
+import { isMutationVector, isShapeDefinition, visitShapes } from "./traverse";
 import {
   ImageDefinition,
   MutationVector,
@@ -34,12 +34,15 @@ const getAnchor = (sprite: SpriteDefinition): Vec2 => {
 export const fileredTriangles = (points: number[][]): number[] =>
   Delaunator.from(points).triangles;
 
-const vectorTypeMapping = {
+const vectorTypeMapping: { [key in MutationVector["type"]]: number } = {
   translate: 1,
   stretch: 2,
   rotate: 3,
   deform: 4,
   opacity: 5,
+  lightness: 6,
+  colorize: 7,
+  saturation: 8,
 };
 
 const mutatorToVec4 = (mutator: MutationVector): Vec4 => [
@@ -88,7 +91,7 @@ export const createMutationList = (
 
   const mutatorMapping: Record<string, number> = {};
 
-  walkShapes(shapes, (item, parents) => {
+  visitShapes(shapes, (item, parents) => {
     if (isMutationVector(item)) {
       const value = mutatorToVec4(item);
       const index = mutators.length;
@@ -105,7 +108,7 @@ export const createMutationList = (
   });
 
   const shapeMutatorMapping: Record<string, number> = {};
-  walkShapes(shapes, (item, parents) => {
+  visitShapes(shapes, (item, parents) => {
     if (isShapeDefinition(item)) {
       const parentMutation = getParentMutation(parents.concat(item));
       const mutatorIndex =
@@ -195,11 +198,17 @@ export type PreparedAnimation = {
   events: [number, string][];
 };
 
+export enum MixMode {
+  MULTIPLY,
+  ADD,
+  HUE,
+}
+
 type DirectControl = {
   mutation: number;
   control: number;
   stepType: number;
-  mixMultiply: boolean;
+  mixMode: MixMode;
   trackX: Float32Array;
   trackY: Float32Array;
 };
@@ -221,6 +230,18 @@ export type PreparedImageDefinition = {
   animations: PreparedAnimation[];
 };
 
+const getMixMode = (mutType: number): MixMode =>
+  mutType === vectorTypeMapping.stretch ||
+  mutType === vectorTypeMapping.lightness ||
+  mutType === vectorTypeMapping.saturation ||
+  mutType === vectorTypeMapping.opacity
+    ? MixMode.MULTIPLY
+    : mutType === vectorTypeMapping.colorize
+    ? MixMode.HUE
+    : MixMode.ADD;
+
+const SUPPORTED_VERSIONS = ["1.0", "1.1"];
+
 /**
  * Convert the JSON based input animation file into a preprocessed list of buffers to place into WebGL
  *
@@ -230,15 +251,17 @@ export type PreparedImageDefinition = {
 export const prepareAnimation = (
   imageDefinition: ImageDefinition
 ): PreparedImageDefinition => {
-  if (imageDefinition.version !== "1.0") {
-    throw new Error("Only version 1.0 files are supported");
+  if (!SUPPORTED_VERSIONS.includes(imageDefinition.version)) {
+    throw new Error(
+      `Version ${imageDefinition.version} files are not supported`
+    );
   }
 
   const elements: PreparedShape[] = [];
   const vertices: Vec4[] = [];
   const indices: number[] = [];
 
-  walkShapes(imageDefinition.shapes, (shape) => {
+  visitShapes(imageDefinition.shapes, (shape) => {
     if (shape.type !== "sprite") return;
 
     const anchor = getAnchor(shape);
@@ -353,9 +376,7 @@ export const prepareAnimation = (
 
       directControls.push({
         mutation: key,
-        mixMultiply:
-          mutType === vectorTypeMapping.stretch ||
-          mutType === vectorTypeMapping.opacity,
+        mixMode: getMixMode(mutType),
         control: control.controlIndex,
         stepType: control.stepType,
         trackX: new Float32Array(

@@ -3,3 +3,4 @@
 /tsconfig.tsbuildinfo
 /.parcel-cache
 /yarn-error.log
+/typedocs.json

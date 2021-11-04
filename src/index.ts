@@ -6,4 +6,6 @@ export type {
   AnimationOptions,
   PlayOptions,
   Unsubscribe,
+  TrackStoppedCallback,
+  CustomEventCallback,
 } from "./player";

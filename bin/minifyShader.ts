@@ -53,9 +53,7 @@ const start: (files: string[]) => void = async ([inputFile]) => {
   const targetFilename = join(targetFolder, `${baseName}-min${extension}`);
 
   const shaderSource = await readFile(inputFile, "utf8");
-
-  const rawGlsl = await readFile(inputFile, "utf8");
-  const minifiedGlsl = await glsl.executeAndStringify(rawGlsl);
+  const minifiedGlsl = await glsl.executeAndStringify(shaderSource);
   await writeFile(targetFilename, minifiedGlsl);
   console.log(
     "%s %f%",

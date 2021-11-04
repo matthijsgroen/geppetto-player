@@ -1,16 +1,16 @@
 import { PreparedFloatBuffer, PreparedIntBuffer } from "./buffer";
-import { PreparedImageDefinition } from "./prepareAnimation";
+import { MixMode, PreparedImageDefinition } from "./prepareAnimation";
 import animationFragmentShader from "./shaders/fragmentShader-min.frag";
 import { animationVertexShader } from "./shaders/vertexShader";
-import { interpolateFloat } from "./vertices";
+import { interpolateFloat, mixHue } from "./vertices";
 
 /**
  * Function to call for unsubscribing to an event listener
  */
 export type Unsubscribe = () => void;
 
-type TrackStoppedCallback = (track: string) => void;
-type CustomEventCallback = (
+export type TrackStoppedCallback = (track: string) => void;
+export type CustomEventCallback = (
   eventName: string,
   track: string,
   time: number
@@ -35,7 +35,7 @@ export type AnimationControls = {
   /**
    * Render a frame of the image.
    */
-  render: () => void;
+  render(): void;
 
   /**
    * Set the looping state of an animation track.
@@ -90,20 +90,48 @@ export type AnimationControls = {
   /**
    * Update the panning of the animation.
    *
-   * @param panX value of horizontal panning. See {@link AnimationOptions.panX}
-   * @param panY value of vertical panning. See {@link AnimationOptions.panY}
+   * @param panX value of horizontal panning. `0` = center, `-1` = left, `1` = right.
+   * @param panY value of vertical panning. `0` = center, `-1` = bottom, `1` = top.
    */
   setPanning(panX: number, panY: number): void;
 
   /**
-   * Update the zoom
+   * Updates the zoom level.
    *
-   * @param zoom See {@link AnimationOptions.zoom}
+   * @param zoom `1` = 100%, `1.5` is 150%, `0.5` = 50% zoom.
    */
   setZoom(zoom: number): void;
+
+  /**
+   * Changes the rendering order of animations.
+   *
+   * @param zIndex The index number for rendering.
+   * The higher the number, the more in the front the element will be stacked.
+   */
   setZIndex(zIndex: number): void;
 
+  /**
+   * Register a callback to get notifications when a track is stopped.
+   * A track can be stopped for the following reasons.
+   *
+   * - A control is used that is conflicting with an animation track.
+   * - Another track is started that is conflicting with an animation track.
+   * - A track is stopped using `stopTrack`
+   *
+   * @param callback function to call when tracks are stopped.
+   * The first argument will be the trackname.
+   * @returns a function to call to unsubscribe
+   */
   onTrackStopped(callback: TrackStoppedCallback): Unsubscribe;
+
+  /**
+   * Register a callback to get notifications when an event is triggered.
+   * Events can be defined in an animation.
+   *
+   * @param callback function that gets called whenever an event happens.
+   * It passes in the eventName, track and time.
+   * @returns a function to call to unsubscribe
+   */
   onEvent(callback: CustomEventCallback): Unsubscribe;
 
   /**
@@ -169,7 +197,7 @@ export type GeppettoPlayer = {
    * If you want to control the rendering process (and the clearing of the canvas) yourself,
    * skip the call to this method in your render cycle.
    */
-  render: () => void;
+  render(): void;
 
   /**
    * Add a Geppetto animation to the player.
@@ -614,7 +642,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             }
 
             for (const [time, event] of playingAnimation.events) {
-              const absTime = playing.iterationStartedAt + time;
+              const absTime = playing.iterationStartedAt + time / playing.speed;
               if (absTime < now && absTime > playing.lastRender) {
                 for (const handler of onCustomEventListeners) {
                   handler(event, playing.name, time);
@@ -639,12 +667,16 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
             const ctrlValue = renderControlValues[data.control];
             const xValue = interpolateFloat(data.trackX, ctrlValue);
             const yValue = interpolateFloat(data.trackY, ctrlValue);
-            if (data.mixMultiply) {
+            if (data.mixMode === MixMode.MULTIPLY) {
               updatedMutationValues[data.mutation * 2] *= xValue;
               updatedMutationValues[data.mutation * 2 + 1] *= yValue;
-            } else {
+            } else if (data.mixMode === MixMode.ADD) {
               updatedMutationValues[data.mutation * 2] += xValue;
               updatedMutationValues[data.mutation * 2 + 1] += yValue;
+            } else {
+              const hue = interpolateFloat(data.trackX, ctrlValue, 0, mixHue);
+              updatedMutationValues[data.mutation * 2] = hue;
+              updatedMutationValues[data.mutation * 2 + 1] *= yValue;
             }
           }
           gl.uniform2fv(mutationValuesLocation, updatedMutationValues);

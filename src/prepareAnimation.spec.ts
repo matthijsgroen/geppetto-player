@@ -1,4 +1,4 @@
-import { prepareAnimation } from "./prepareAnimation";
+import { MixMode, prepareAnimation } from "./prepareAnimation";
 import { ImageDefinition } from "./types";
 
 describe("prepareAnimation", () => {
@@ -285,7 +285,7 @@ describe("prepareAnimation", () => {
           control: 1, // Control2
           mutation: 1, // hide
           stepType: 0, // (default for now)
-          mixMultiply: true,
+          mixMode: MixMode.MULTIPLY,
           trackX: new Float32Array([0, 1, 1, 0.2]),
           trackY: new Float32Array([0, 0, 1, 0]),
         });
@@ -294,7 +294,7 @@ describe("prepareAnimation", () => {
           control: 0, // Control1
           mutation: 2, // mutate
           stepType: 0, // (default for now)
-          mixMultiply: false,
+          mixMode: MixMode.ADD,
           trackX: new Float32Array([0, 15, 1, -15]),
           trackY: new Float32Array([0, 0, 1, 0]),
         });
@@ -303,7 +303,7 @@ describe("prepareAnimation", () => {
           control: 2, // Control3
           mutation: 5, // move
           stepType: 0, // (default for now)
-          mixMultiply: false,
+          mixMode: MixMode.ADD,
           trackX: new Float32Array([0, -500, 1, 300]),
           trackY: new Float32Array([0, 0, 1, 0]),
         });
@@ -346,18 +346,18 @@ describe("prepareAnimation", () => {
   });
 
   describe("version checking", () => {
-    it("supports version 1.0", () => {
-      const file = { ...imageDefinition, version: "1.0" };
+    it.each(["1.0", "1.1"])("Supports version (%s)", (version) => {
+      const file = { ...imageDefinition, version: version };
       expect(() => {
         prepareAnimation(file);
-      }).not.toThrowError("Only version 1.0 files are supported");
+      }).not.toThrowError();
     });
 
-    it.each(["1.1", "2.0"])("Rejects other versions (%s)", (version) => {
+    it.each(["1.2", "2.0"])("Rejects other versions (%s)", (version) => {
       const file = { ...imageDefinition, version };
       expect(() => {
         prepareAnimation(file);
-      }).toThrowError("Only version 1.0 files are supported");
+      }).toThrowError(`Version ${version} files are not supported`);
     });
   });
 });
