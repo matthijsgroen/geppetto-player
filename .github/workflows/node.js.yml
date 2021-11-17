@@ -32,5 +32,3 @@ jobs:
         run: yarn lint
       - name: Build package
         run: yarn build
-      - name: size-limit-action
-        uses: andresz2/size-limit-action@v1
