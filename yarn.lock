@@ -2433,7 +2433,7 @@ chokidar@^2.1.8:
   optionalDependencies:
     fsevents "^1.2.7"
 
-chokidar@^3.4.1, chokidar@^3.5.1:
+chokidar@^3.4.1, chokidar@^3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.5.2.tgz#dba3976fcadb016f66fd365021d91600d01c1e75"
   integrity sha512-ekGhOnNVPgT77r4K/U3GDhu+FQ2S8TnK/s2KbIGXi0SZWuwkZ2QNyfWdZW+TVfn84DpEP7rLeCt2UI6bJ8GwbQ==
@@ -2577,11 +2577,6 @@ colord@^2.9.1:
   version "2.9.1"
   resolved "https://registry.yarnpkg.com/colord/-/colord-2.9.1.tgz#c961ea0efeb57c9f0f4834458f26cb9cc4a3f90e"
   integrity sha512-4LBMSt09vR0uLnPVkOUBnmxgoaeN4ewRbx801wY/bXcltXfpR/G46OdWn96XpYmCWuYvO46aBZP4NgX8HpNAcw==
-
-colorette@^1.2.2:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/colorette/-/colorette-1.4.0.tgz#5190fbb87276259a86ad700bff2c6d6faa3fca40"
-  integrity sha512-Y2oEozpomLn7Q3HFP7dpww7AtMJplbM9lGZP6RDfHqmbeRjiwRg4n6VM6j4KLmRke85uWEI7JqF17f3pqdRA0g==
 
 combined-stream@^1.0.6, combined-stream@^1.0.8, combined-stream@~1.0.6:
   version "1.0.8"
@@ -4035,7 +4030,7 @@ globals@^13.2.0, globals@^13.6.0, globals@^13.9.0:
   dependencies:
     type-fest "^0.20.2"
 
-globby@^11.0.3:
+globby@^11.0.3, globby@^11.0.4:
   version "11.0.4"
   resolved "https://registry.yarnpkg.com/globby/-/globby-11.0.4.tgz#2cbaff77c2f2a62e71e9b2813a67b97a3a3001a5"
   integrity sha512-9O4MVG9ioZJ08ffbcyVYyLOJLk5JQ688pJ4eMGLpdWLHq/Wr1D9BlriLQyL0E+jbkuePVZXYFj47QM/v093wHg==
@@ -5959,6 +5954,13 @@ nanomatch@^1.2.9:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
+nanospinner@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/nanospinner/-/nanospinner-0.4.0.tgz#f544f71fb990423528b8f6dd6c26134cf9f21659"
+  integrity sha512-FhxiB9PcEztMw6XfQDSLJBMlmN4n7B2hl/oiK4Hy9479r1+df0i2099DgcEx+m6yBfBJVUuKpILvP8fM3rK3Sw==
+  dependencies:
+    picocolors "^1.0.0"
+
 natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
@@ -6250,7 +6252,7 @@ optionator@^0.9.1:
     type-check "^0.4.0"
     word-wrap "^1.2.3"
 
-ora@^5.2.0, ora@^5.4.1:
+ora@^5.2.0:
   version "5.4.1"
   resolved "https://registry.yarnpkg.com/ora/-/ora-5.4.1.tgz#1b2678426af4ac4a509008e5e4ac9e9959db9e18"
   integrity sha512-5b6Y85tPxZZ7QytO+BQzysW31HJku27cRIlkbAXaNx+BdcVi+LlRFmVXzeF6a7JCwJpyw5c4b+YSVImQIrBpuQ==
@@ -7563,19 +7565,18 @@ sisteransi@^1.0.5:
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.5.tgz#134d681297756437cc05ca01370d3a7a571075ed"
   integrity sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==
 
-size-limit@^4.10.1:
-  version "4.12.0"
-  resolved "https://registry.yarnpkg.com/size-limit/-/size-limit-4.12.0.tgz#ecc9c0448c049a40b10e76b5e1b4a20f99a54468"
-  integrity sha512-LwlUDPxFJbJDIJsBE5bKo8kFMuxmuewBMDjgfSoQwnO27V8DSK+j6881nsrX3GoM3bJMFIeEq56thqBEdYC8bw==
+size-limit@^6.0.4:
+  version "6.0.4"
+  resolved "https://registry.yarnpkg.com/size-limit/-/size-limit-6.0.4.tgz#f3345206d8c25485d0d31ea41622761a3a1aad93"
+  integrity sha512-zo/9FrXzetvZGFJnd1LC4mR9GvirElALlerMY3EOwEGdW7Lwgl2WT0hTRC2559ZR2PGfRpnXEgAFkayGAJOebg==
   dependencies:
     bytes-iec "^3.1.1"
-    chokidar "^3.5.1"
+    chokidar "^3.5.2"
     ci-job-number "^1.2.2"
-    colorette "^1.2.2"
-    globby "^11.0.3"
+    globby "^11.0.4"
     lilconfig "^2.0.3"
-    ora "^5.4.1"
-    read-pkg-up "^7.0.1"
+    nanospinner "^0.4.0"
+    picocolors "^1.0.0"
 
 slash@^3.0.0:
   version "3.0.0"
