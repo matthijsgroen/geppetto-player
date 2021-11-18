@@ -74,7 +74,7 @@ start();
 ## Why do I need to setup this render loop myself?
 
 It is to give you more control. You can specify the resolution to render,
-or render multiply Geppetto animations in the same WebGL Canvas. You could even create framebuffers, render into them and apply a shader aftereffect on it if you desire. (all these things I consider outside of the scope of this player library :-))
+or render multiple Geppetto animations in the same WebGL Canvas. You could even create framebuffers, render into them and apply a shader aftereffect on it if you desire. (all these things I consider outside of the scope of this player library :-))
 
 ## Using the library in a babel built site (Webpack, CRA)
 
