@@ -323,44 +323,46 @@ export const prepareAnimation = (
   elements.sort((a, b) => (b.z || 0) - (a.z || 0));
 
   const controlValues = new Float32Array(imageDefinition.controls.length);
-  const mutationControlData: MutationControl = imageDefinition.controls.reduce<MutationControl>(
-    (result, control, index) => {
-      const controlMutations = control.steps.reduce<string[]>(
-        (result, frame) =>
-          result.concat(
-            Object.keys(frame).filter((name) => !result.includes(name))
-          ),
-        []
-      );
-      controls.push({
-        name: control.name,
-        steps: control.steps.length,
-      });
-      controlValues[index] = imageDefinition.controlValues[control.name];
-      controlMutations.forEach((mutation) => {
-        const index = mutators.indexOf(mutation);
-        const values: Vec2[] = control.steps.map((k) => k[mutation]);
-        const controlIndex =
-          imageDefinition?.controls.findIndex((c) => c.name === control.name) ||
-          0;
-
-        const controlData: ControlData = {
+  const mutationControlData: MutationControl =
+    imageDefinition.controls.reduce<MutationControl>(
+      (result, control, index) => {
+        const controlMutations = control.steps.reduce<string[]>(
+          (result, frame) =>
+            result.concat(
+              Object.keys(frame).filter((name) => !result.includes(name))
+            ),
+          []
+        );
+        controls.push({
           name: control.name,
-          controlIndex,
-          valueStartIndex: 0,
-          values,
-          stepType: 0,
-        };
+          steps: control.steps.length,
+        });
+        controlValues[index] = imageDefinition.controlValues[control.name];
+        controlMutations.forEach((mutation) => {
+          const index = mutators.indexOf(mutation);
+          const values: Vec2[] = control.steps.map((k) => k[mutation]);
+          const controlIndex =
+            imageDefinition?.controls.findIndex(
+              (c) => c.name === control.name
+            ) || 0;
 
-        result = {
-          ...result,
-          [index]: (result[index] || []).concat(controlData),
-        };
-      });
-      return result;
-    },
-    {}
-  );
+          const controlData: ControlData = {
+            name: control.name,
+            controlIndex,
+            valueStartIndex: 0,
+            values,
+            stepType: 0,
+          };
+
+          result = {
+            ...result,
+            [index]: (result[index] || []).concat(controlData),
+          };
+        });
+        return result;
+      },
+      {}
+    );
 
   controlMutationIndicesList.length = mutatorInfo.vectorSettings.length;
   controlMutationIndicesList.fill([0, 0]);

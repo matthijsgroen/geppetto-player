@@ -292,22 +292,21 @@ const setupWebGLProgram = (
   return [program, vs, fs];
 };
 
-const setProgramBuffer = (gl: WebGLRenderingContext, program: WebGLProgram) => (
-  uniform: string,
-  buffer: PreparedFloatBuffer | PreparedIntBuffer
-) => {
-  const uniformLocation = gl.getUniformLocation(program, uniform);
-  const stride = buffer.stride;
+const setProgramBuffer =
+  (gl: WebGLRenderingContext, program: WebGLProgram) =>
+  (uniform: string, buffer: PreparedFloatBuffer | PreparedIntBuffer) => {
+    const uniformLocation = gl.getUniformLocation(program, uniform);
+    const stride = buffer.stride;
 
-  if (stride == 2) {
-    gl.uniform2fv(uniformLocation, buffer.data);
-  } else if (stride == 3) {
-    gl.uniform3fv(uniformLocation, buffer.data);
-  } else if (stride == 4) {
-    gl.uniform4fv(uniformLocation, buffer.data);
-  }
-  return uniformLocation;
-};
+    if (stride == 2) {
+      gl.uniform2fv(uniformLocation, buffer.data);
+    } else if (stride == 3) {
+      gl.uniform3fv(uniformLocation, buffer.data);
+    } else if (stride == 4) {
+      gl.uniform4fv(uniformLocation, buffer.data);
+    }
+    return uniformLocation;
+  };
 
 const setupTexture = (
   gl: WebGLRenderingContext,
