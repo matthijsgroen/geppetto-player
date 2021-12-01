@@ -331,6 +331,8 @@ const setupTexture = (
   return texture;
 };
 
+let animId = 0;
+
 /**
  * Initializes a player to display in an existing WebGL Environment.
  * Use this function to create a player if you want to have full control over the
@@ -342,7 +344,10 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
   const gl = getContext(element);
 
   const animations: AnimationControls[] = [];
-  let onTrackStoppedListeners: TrackStoppedCallback[] = [];
+  let onTrackStoppedListeners: {
+    animation: number;
+    callback: TrackStoppedCallback;
+  }[] = [];
   let onCustomEventListeners: CustomEventCallback[] = [];
 
   return {
@@ -351,6 +356,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
       gl.viewport(0, 0, element.width, element.height);
     },
     addAnimation: (animation, image, textureUnit, options) => {
+      const id = ++animId;
       const unit = [
         gl.TEXTURE0,
         gl.TEXTURE1,
@@ -458,7 +464,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
         }
 
         for (const listener of onTrackStoppedListeners) {
-          listener(track);
+          if (listener.animation === id) listener.callback(track);
         }
       };
 
@@ -694,10 +700,13 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
           }
         },
         onTrackStopped(callback) {
-          onTrackStoppedListeners = onTrackStoppedListeners.concat(callback);
+          onTrackStoppedListeners = onTrackStoppedListeners.concat({
+            animation: id,
+            callback,
+          });
           return () => {
             onTrackStoppedListeners = onTrackStoppedListeners.filter(
-              (item) => item !== callback
+              (item) => item.callback !== callback
             );
           };
         },
