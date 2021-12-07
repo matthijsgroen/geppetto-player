@@ -332,6 +332,9 @@ const setupTexture = (
 };
 
 let animId = 0;
+// A few extra milliseconds to make sure the last frame of an animation is rendered,
+// preventing visual artifacts
+const ENDING_MARGIN = 2;
 
 /**
  * Initializes a player to display in an existing WebGL Environment.
@@ -633,17 +636,16 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
 
             const playPosition = playTime % playingAnimation.duration;
 
-            if (playingAnimation.duration < playTime) {
+            if (playingAnimation.duration < playTime - ENDING_MARGIN) {
               if (!looping[playing.index]) {
                 stopTrack(playingAnimation.name);
                 continue;
               }
-              playing.iterationStartedAt = now - playPosition;
-
               // Store current value as start value of next iteration
               for (const [controlIndex] of playingAnimation.tracks) {
                 controlValues[controlIndex] = renderControlValues[controlIndex];
               }
+              playing.iterationStartedAt = now - playPosition;
             }
 
             for (const [time, event] of playingAnimation.events) {
