@@ -532,7 +532,7 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
           if (textureIndex > -1) {
             const usesLeft = --textureMapping[textureIndex][3];
             if (usesLeft === 0) {
-          gl.deleteTexture(texture);
+              gl.deleteTexture(texture);
               textureMapping.splice(textureIndex, 1);
             }
           }
