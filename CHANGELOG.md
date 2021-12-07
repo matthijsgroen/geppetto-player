@@ -5,17 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [UNRELEASED]
+
+### Changed
+
+- Added few milliseconds padding to tracks before stopping, preventing glitches.
+
+### Added
+
+- Support for reusing WebGL Texture if provided `HTMLImageElement` has been used before.
+
 ## [1.3.3] - 2021-12-01
 
 ### Fixed
 
-- Issue where `onTrackStopped` callbacks where triggered from the wrong animation
+- Issue where `onTrackStopped` callbacks where triggered from the wrong animation.
 
 ## [1.3.1] - 2021-11-29
 
 ### Fixed
 
-- Issue where simple animations caused a failure in shader compilation
+- Issue where simple animations caused a failure in shader compilation.
 
 ## [1.3.0] - 2021-11-17
 
