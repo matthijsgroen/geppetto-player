@@ -310,10 +310,13 @@ const setProgramBuffer =
 
 const setupTexture = (
   gl: WebGLRenderingContext,
-  program: WebGLProgram,
   image: HTMLImageElement
-): WebGLTexture | null => {
+): WebGLTexture => {
   const texture = gl.createTexture();
+  if (texture === null) {
+    throw new Error("Failed to initialize texture");
+  }
+
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -321,17 +324,14 @@ const setupTexture = (
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-  gl.useProgram(program);
-  gl.uniform2f(
-    gl.getUniformLocation(program, "uTextureDimensions"),
-    image.width,
-    image.height
-  );
 
   return texture;
 };
 
 let animId = 0;
+// A few extra milliseconds to make sure the last frame of an animation is rendered,
+// preventing visual artifacts
+const ENDING_MARGIN = 2;
 
 /**
  * Initializes a player to display in an existing WebGL Environment.
@@ -350,6 +350,8 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
   }[] = [];
   let onCustomEventListeners: CustomEventCallback[] = [];
 
+  const textureMapping: [number, WebGLTexture, HTMLImageElement, number][] = [];
+
   return {
     render: () => {
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -357,22 +359,25 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
     },
     addAnimation: (animation, image, textureUnit, options) => {
       const id = ++animId;
-      const unit = [
-        gl.TEXTURE0,
-        gl.TEXTURE1,
-        gl.TEXTURE2,
-        gl.TEXTURE3,
-        gl.TEXTURE4,
-        gl.TEXTURE5,
-        gl.TEXTURE6,
-        gl.TEXTURE7,
-        gl.TEXTURE8,
-        gl.TEXTURE9,
-      ][textureUnit];
+      const existingTexture = textureMapping.find((m) => m[2] === image);
+
+      const [unit, texture] = existingTexture
+        ? existingTexture
+        : [gl.TEXTURE0 + textureUnit, setupTexture(gl, image)];
+      if (existingTexture) {
+        existingTexture[3]++;
+      } else {
+        textureMapping.push([unit, texture, image, 1]);
+      }
+
       const [program, vs, fs] = setupWebGLProgram(gl, animation);
-      // 3. Load texture
+
       gl.useProgram(program);
-      const texture = setupTexture(gl, program, image);
+      gl.uniform2f(
+        gl.getUniformLocation(program, "uTextureDimensions"),
+        image.width,
+        image.height
+      );
 
       // 4. Set Uniforms
       const parentLocation = gl.getUniformLocation(program, "uMutParent");
@@ -521,7 +526,17 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
           gl.deleteShader(vs);
           gl.deleteShader(fs);
           gl.deleteProgram(program);
-          gl.deleteTexture(texture);
+          const textureIndex = textureMapping.findIndex(
+            (e) => e[1] === texture
+          );
+          if (textureIndex > -1) {
+            const usesLeft = --textureMapping[textureIndex][3];
+            if (usesLeft === 0) {
+              gl.deleteTexture(texture);
+              textureMapping.splice(textureIndex, 1);
+            }
+          }
+
           gl.deleteBuffer(vertexBuffer);
           gl.deleteBuffer(indexBuffer);
           animations.splice(animations.indexOf(newAnimation), 1);
@@ -633,17 +648,16 @@ export const createPlayer = (element: HTMLCanvasElement): GeppettoPlayer => {
 
             const playPosition = playTime % playingAnimation.duration;
 
-            if (playingAnimation.duration < playTime) {
+            if (playingAnimation.duration < playTime - ENDING_MARGIN) {
               if (!looping[playing.index]) {
                 stopTrack(playingAnimation.name);
                 continue;
               }
-              playing.iterationStartedAt = now - playPosition;
-
               // Store current value as start value of next iteration
               for (const [controlIndex] of playingAnimation.tracks) {
                 controlValues[controlIndex] = renderControlValues[controlIndex];
               }
+              playing.iterationStartedAt = now - playPosition;
             }
 
             for (const [time, event] of playingAnimation.events) {
