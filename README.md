@@ -1,3 +1,7 @@
+# Archived
+
+This repo is now archived, the player has moved to the [Geppetto](https://github.com/matthijsgroen/geppetto) repo
+
 # Geppetto player 🌱
 
 [![npm type definitions](https://img.shields.io/npm/types/geppetto-player)](https://matthijsgroen.github.io/geppetto-player)
